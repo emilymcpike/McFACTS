@@ -22,7 +22,7 @@ def init_single_stars(opts, id_start_val=None):
             opts.nsc_density_index_inner,
         )
     # giprint(star_num_initial) 152_248_329
-    star_num_initial = 10_000
+    star_num_initial = 20_000
 
     # Generate initial masses for the initial number of stars, pre-Hill sphere mergers
     masses_initial = setupdiskstars.setup_disk_stars_masses(star_num=star_num_initial,
