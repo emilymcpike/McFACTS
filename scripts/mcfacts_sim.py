@@ -298,7 +298,7 @@ def main():
                                           category=np.full(blackholes.num, 0),
                                           orb_a=blackholes.orb_a,
                                           mass=blackholes.mass,
-                                          size=np.full(blackholes.num, -1),
+                                          size=np.full(blackholes.num, -1.5),
                                           )
 
         # Initialize stars
@@ -801,14 +801,14 @@ def main():
                     # Spheroid encounters
                     # FIX THIS: Replace nsc_imf_bh below with nsc_imf_stars_ since pulling from stellar MF
 
-                    blackholes_binary = dynamics.bin_spheroid_encounter_obj(
+                    blackholes_binary = dynamics.bin_spheroid_encounter(
                         opts.smbh_mass,
                         opts.timestep_duration_yr,
                         blackholes_binary,
                         time_passed,
                         opts.nsc_imf_bh_powerlaw_index,
                         opts.delta_energy_strong,
-                        opts.nsc_spheroid_normalization
+                        opts.nsc_spheroid_normalization,
                     )
 
                 if (opts.flag_dynamic_enc > 0):
@@ -929,9 +929,9 @@ def main():
                         new_orb_ecc=np.full(bh_binary_id_num_ionization.size * 2, 0.01),
                         new_orb_inc=np.full(bh_binary_id_num_ionization.size * 2, 0.0),
                         new_orb_ang_mom=np.ones(bh_binary_id_num_ionization.size * 2),
-                        new_orb_arg_periapse=np.full(bh_binary_id_num_ionization.size * 2, -1),
-                        new_gw_freq=np.full(bh_binary_id_num_ionization.size * 2, -1),
-                        new_gw_strain=np.full(bh_binary_id_num_ionization.size * 2, -1),
+                        new_orb_arg_periapse=np.full(bh_binary_id_num_ionization.size * 2, -1.5),
+                        new_gw_freq=np.full(bh_binary_id_num_ionization.size * 2, -1.5),
+                        new_gw_strain=np.full(bh_binary_id_num_ionization.size * 2, -1.5),
                         new_galaxy=np.full(bh_binary_id_num_ionization.size * 2, galaxy),
                         new_time_passed=np.full(bh_binary_id_num_ionization.size * 2, time_passed),
                         new_id_num=np.arange(filing_cabinet.id_max+1, filing_cabinet.id_max + 1 + bh_binary_id_num_ionization.size * 2, 1)
@@ -947,7 +947,7 @@ def main():
                         new_mass=np.concatenate([
                             blackholes_binary.at_id_num(bh_binary_id_num_ionization, "mass_1"),
                             blackholes_binary.at_id_num(bh_binary_id_num_ionization, "mass_2")]),
-                        new_size=np.full(bh_binary_id_num_ionization.size * 2, -1),
+                        new_size=np.full(bh_binary_id_num_ionization.size * 2, -1.5),
                         new_direction=np.ones(bh_binary_id_num_ionization.size * 2),
                         new_disk_inner_outer=np.zeros(bh_binary_id_num_ionization.size * 2)
                     )
@@ -1044,7 +1044,7 @@ def main():
                                                       new_orb_ecc=np.full(bh_binary_id_num_merger.size, 0.01),
                                                       new_gen=np.maximum(blackholes_merged.at_id_num(bh_binary_id_num_merger, "gen_1"),
                                                                          blackholes_merged.at_id_num(bh_binary_id_num_merger, "gen_2")) + 1.0,
-                                                      new_orb_arg_periapse=np.full(bh_binary_id_num_merger.size, -1),
+                                                      new_orb_arg_periapse=np.full(bh_binary_id_num_merger.size, -1.5),
                                                       new_galaxy=np.full(bh_binary_id_num_merger.size, galaxy),
                                                       new_time_passed=np.full(bh_binary_id_num_merger.size, time_passed),
                                                       new_id_num=bh_binary_id_num_merger)
@@ -1055,7 +1055,7 @@ def main():
                                             new_info=np.full(bh_binary_id_num_merger.size, 0))
                         filing_cabinet.update(id_num=bh_binary_id_num_merger,
                                             attr="size",
-                                            new_info=np.full(bh_binary_id_num_merger.size, -1))
+                                            new_info=np.full(bh_binary_id_num_merger.size, -1.5))
                         blackholes_binary.remove_id_num(bh_binary_id_num_merger)
 
                     # Append new merged BH to arrays of single BH locations, masses, spins, spin angles & gens
@@ -1133,7 +1133,7 @@ def main():
                                               new_orb_inc=bh_orb_inc_captured,
                                               new_orb_ang_mom=np.ones(bh_mass_captured.size),
                                               new_orb_ecc=bh_orb_ecc_captured,
-                                              new_orb_arg_periapse=np.full(bh_mass_captured.size, -1),
+                                              new_orb_arg_periapse=np.full(bh_mass_captured.size, -1.5),
                                               new_gen=bh_gen_captured,
                                               new_galaxy=np.full(len(bh_mass_captured),galaxy),
                                               new_time_passed=np.full(len(bh_mass_captured),time_passed),
@@ -1319,7 +1319,7 @@ def main():
             new_orb_inc=np.zeros(blackholes_binary.num * 2),  # Assume orb_inc = 0.0
             new_orb_ang_mom=np.ones(blackholes_binary.num * 2),  # Assume all are prograde
             new_orb_ecc=np.zeros(blackholes_binary.num * 2),  # Assume orb_ecc = 0.0
-            new_orb_arg_periapse=np.full(blackholes_binary.num * 2, -1),  # Assume orb_arg_periapse = -1
+            new_orb_arg_periapse=np.full(blackholes_binary.num * 2, -1.5),  # Assume orb_arg_periapse = -1
             new_galaxy=np.full(blackholes_binary.num * 2, galaxy),
             new_time_passed=np.full(blackholes_binary.num * 2, time_passed),
             new_gen=np.concatenate([blackholes_binary.gen_1, blackholes_binary.gen_2]),
@@ -1332,7 +1332,7 @@ def main():
             new_category=np.zeros(blackholes_binary.num * 2),
             new_orb_a=np.concatenate([blackholes_binary.orb_a_1, blackholes_binary.orb_a_2]),
             new_mass=np.concatenate([blackholes_binary.mass_1, blackholes_binary.mass_1]),
-            new_size=np.full(blackholes_binary.num * 2, -1),
+            new_size=np.full(blackholes_binary.num * 2, -1.5),
             new_direction=np.ones(blackholes_binary.num * 2),
             new_disk_inner_outer=np.zeros(blackholes_binary.num * 2)
         )
