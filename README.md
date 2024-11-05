@@ -8,13 +8,15 @@
     <br>
 </h1>
 
-<h4 align="center">A python package that does the AGN channel for you!</h4>
+<h4 align="center">A python package that does the AGN channel for you! </h4>
 
 McFACTS is the first public, open source, population synthesis code modeling the *full* AGN channel for LVK detectable BBH mergers.
 
 ### Documentation
 
 You can find more information about McFACTS as well as contact and office hour information at our [website](https://saavikford.wixsite.com/saavik/general-7). It's a work in progress, so please be patient!
+
+Opt-in to everything McFACTS: click [here](https://docs.google.com/forms/d/109iAl9Mey8VZY8NWOjkIsubzNdP7UlYSyr38LQWrSq4/prefill) to join our mailing list.
 
 You can find documentation for our code and modules at our [Read the Docs](https://mcfacts.readthedocs.io).
 
@@ -130,6 +132,6 @@ McFACTS will also generate the following plots:
 
 Paper 1: (https://arxiv.org/abs/2410.16515)
 
-McFACTS is developed by Barry McKernan, K. E. Saavik Ford, Harrison E. Cook, Vera Delfavero, Kaila Nathaniel, Jake Postiglione, Shawn Ray, and Richard O'Shaughnessy. If you use McFACTS in your work, please cite the following:
+McFACTS is developed by Barry McKernan, K. E. Saavik Ford, Harrison E. Cook, Vera Delfavero, Emily McPike, Kaila Nathaniel, Jake Postiglione, Shawn Ray, and Richard O'Shaughnessy. If you use McFACTS in your work, please cite the following:
 
 * McKernan, B., Ford, K.E.S., Cook, H.E., et al., *McFACTS I: Testing the LVK AGN channel with Monte Carlo for AGN Channel Testing and Simulation (McFACTS)*. 2024. ([arXiv](https://arxiv.org/abs/2410.16515))
