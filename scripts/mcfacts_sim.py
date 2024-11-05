@@ -726,7 +726,7 @@ def main():
                     # Harden binaries due to encounters with circular singletons (e.g. Leigh et al. 2018)
                     # FIX THIS: RETURN perturbed circ singles (orb_a, orb_ecc)
 
-                    blackholes_binary = dynamics.circular_binaries_encounters_circ_prograde_obj(
+                    blackholes_binary = dynamics.circular_binaries_encounters_circ_prograde(
                         opts.smbh_mass,
                         blackholes_pro.orb_a,
                         blackholes_pro.mass,
