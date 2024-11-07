@@ -361,7 +361,7 @@ def circular_binaries_encounters_ecc_prograde(
     bin_masses = blackholes_binary.mass_1 + blackholes_binary.mass_2
     bin_velocities = scipy.constants.c/np.sqrt(blackholes_binary.bin_orb_a)
     bin_binding_energy = scipy.constants.G*((solar_mass)**2)*blackholes_binary.mass_1*blackholes_binary.mass_2/(blackholes_binary.bin_sep*rg_in_meters)
-    bin_orbital_times = 3.15*(smbh_mass/1.e8) * np.power(blackholes_binary.bin_orb_a / 1.e3, 1.5)
+    bin_orbital_times = 3.15*(smbh_mass/1.e8) * ((blackholes_binary.bin_orb_a / 1.e3)**1.5)
     bin_orbits_per_timestep = timestep_duration_yr/bin_orbital_times
 
     # Find the e> crit_ecc population. These are the interlopers that can perturb the circularized population
@@ -397,7 +397,7 @@ def circular_binaries_encounters_ecc_prograde(
 
                 temp_bin_mass = bin_masses[i] + ecc_prograde_population_masses[j]
                 bh_smbh_mass_ratio = temp_bin_mass / (3.0 * smbh_mass)
-                mass_ratio_factor = np.power(bh_smbh_mass_ratio, 1. / 3.)
+                mass_ratio_factor = (bh_smbh_mass_ratio)**(1./3.)
                 prob_orbit_overlap = (1. / scipy.constants.pi) * mass_ratio_factor
                 prob_enc_per_timestep = prob_orbit_overlap * bin_orbits_per_timestep[i]
                 # Cap prob_enc_per_timestep at 1
@@ -415,7 +415,7 @@ def circular_binaries_encounters_ecc_prograde(
                     relative_velocities = np.abs(bin_velocities[i] - ecc_velocities[j])
 
                     # K.E. of interloper
-                    ke_interloper = 0.5 * ecc_prograde_population_masses[j] * solar_mass * np.power(relative_velocities, 2.0)
+                    ke_interloper = 0.5 * ecc_prograde_population_masses[j] * solar_mass * (relative_velocities**2.0)
                     hard = bin_binding_energy[i] - ke_interloper
 
                     if hard > 0:
@@ -597,7 +597,7 @@ def circular_binaries_encounters_circ_prograde(
 
     # Housekeeping
     solar_mass = astropy_units.solMass.to("kg")
-    rg_in_meters = scipy.constants.G * (solar_mass*smbh_mass) / np.power(scipy.constants.c, 2.0)
+    rg_in_meters = scipy.constants.G * (solar_mass*smbh_mass) / (scipy.constants.c**2.0)
 
     # Magnitude of energy change to drive binary to merger in ~2 interactions in a strong encounter. Say de_strong=0.9
     # de_strong here refers to the perturbation of the binary around its center of mass
@@ -610,9 +610,9 @@ def circular_binaries_encounters_circ_prograde(
     # Set up arrays for later
     bin_masses = blackholes_binary.mass_1 + blackholes_binary.mass_2
     bin_velocities = scipy.constants.c/np.sqrt(blackholes_binary.bin_orb_a)
-    bin_orbital_times = 3.15 * (smbh_mass / 1.e8) * np.power(blackholes_binary.bin_orb_a / 1.e3, 1.5)
+    bin_orbital_times = 3.15 * (smbh_mass / 1.e8) * ((blackholes_binary.bin_orb_a / 1.e3)**1.5)
     bin_orbits_per_timestep = timestep_duration_yr / bin_orbital_times
-    bin_binding_energy = scipy.constants.G * np.power(solar_mass, 2) * blackholes_binary.mass_1 * blackholes_binary.mass_2 / (blackholes_binary.bin_sep * rg_in_meters)
+    bin_binding_energy = scipy.constants.G * (solar_mass**2.0) * blackholes_binary.mass_1 * blackholes_binary.mass_2 / (blackholes_binary.bin_sep * rg_in_meters)
 
     # Find the e< crit_ecc population. These are the interlopers w. low encounter vel that can harden the circularized population
     circ_prograde_population = np.ma.masked_where(disk_bh_pro_orbs_ecc > disk_bh_pro_orb_ecc_crit, disk_bh_pro_orbs_ecc)
@@ -643,7 +643,7 @@ def circular_binaries_encounters_circ_prograde(
                 # r_h = a_circ1(temp_bin_mass/3smbh_mass)^1/3 so prob_enc/orb = mass_ratio^1/3/pi
                 temp_bin_mass = bin_masses[i] + circ_prograde_population_masses[j]
                 bh_smbh_mass_ratio = temp_bin_mass/(3.0 * smbh_mass)
-                mass_ratio_factor = np.power(bh_smbh_mass_ratio, 1./3.)                        
+                mass_ratio_factor = (bh_smbh_mass_ratio**1./3.)                        
                 prob_orbit_overlap = (1. / scipy.constants.pi) * mass_ratio_factor
                 prob_enc_per_timestep = prob_orbit_overlap * bin_orbits_per_timestep[i]
                 # critical velocity for ionization given by
@@ -659,7 +659,7 @@ def circular_binaries_encounters_circ_prograde(
                     # Find relative velocity of interloper in km/s so divide by 1.e3
                     rel_vel_ms = abs(bin_velocities[i] - circ_velocities[j])
                     # K.E. of interloper
-                    ke_interloper = 0.5 * circ_prograde_population_masses[j] * solar_mass * np.power(rel_vel_ms, 2.0)
+                    ke_interloper = 0.5 * circ_prograde_population_masses[j] * solar_mass * (rel_vel_ms**2.0)
                     hard = bin_binding_energy[i] - ke_interloper
 
                     if (hard > 0):
@@ -910,12 +910,12 @@ def bin_spheroid_encounter(
         # NOTE: Stars should be most common sph component. Switch to BH after some long time.
         mode_star = 2.0
         mass_3 = (rng.pareto(nsc_bh_imf_powerlaw_index, size=num_encounters) + 1) * mode_star
-        radius_3 = bin_orb_a * np.power(10, -0.5 + rng.uniform(size=num_encounters))
+        radius_3 = bin_orb_a * (10**(-0.5 + rng.uniform(size=num_encounters)))
         # K.E_3 in Joules
         # Keplerian velocity of ecc prograde orbiter around SMBH (=c/sqrt(a/r_g))
         velocity_3 = scipy.constants.c/np.sqrt(radius_3)
         relative_velocities = np.abs(bin_velocities[chances_of_encounter < enc_rate] - velocity_3)
-        ke_3 = 0.5*mass_3*solar_mass*np.power(relative_velocities, 2.0)
+        ke_3 = 0.5 * mass_3 * solar_mass * (relative_velocities**2.0)
 
         # Compare orbital angular momentum for interloper and binary
         # Ratio of L3/Lbin =(m3/M_bin)*sqrt(R3/R_com)

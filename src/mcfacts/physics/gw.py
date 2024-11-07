@@ -62,20 +62,20 @@ def gw_strain_freq(mass_1, mass_2, obj_sep, timestep_duration_yr, old_gw_freq, s
     mass_total = mass_1 + mass_2
     bin_sep = obj_sep * rg
 
-    mass_chirp = np.power(mass_1 * mass_2, 3./5.) / np.power(mass_total, 1./5.)
-    rg_chirp = ((const.G * mass_chirp) / np.power(const.c, 2)).to(u.meter)
+    mass_chirp = ((mass_1 * mass_2)**(3./5.)) / (mass_total**(1./5.))
+    rg_chirp = ((const.G * mass_chirp) / (const.c**2.0)).to(u.meter)
 
     # If separation is less than rg_chirp then cap separation at rg_chirp.
     bin_sep[bin_sep < rg_chirp] = rg_chirp[bin_sep < rg_chirp]
 
-    nu_gw = (1.0/np.pi) * np.sqrt(mass_total * const.G / np.power(bin_sep, 3))
+    nu_gw = (1.0/np.pi) * np.sqrt(mass_total * const.G / (bin_sep**3.0))
     nu_gw = nu_gw.to(u.Hz)
 
     # For local distances, approx d=cz/H0 = 3e8m/s(z)/70km/s/Mpc =3.e8 (z)/7e4 Mpc =428 Mpc
     # From Ned Wright's calculator https://www.astro.ucla.edu/~wright/CosmoCalc.html
     # (z=0.1)=421Mpc. (z=0.5)=1909 Mpc
     d_obs = redshift_d_obs_dict[agn_redshift].to(u.meter)
-    strain = (4/d_obs) * rg_chirp * np.power(np.pi * nu_gw * rg_chirp / const.c, 2./3.)
+    strain = (4/d_obs) * rg_chirp * ((np.pi * nu_gw * rg_chirp / const.c)**(2./3.))
 
     # But power builds up in band over multiple cycles!
     # So characteristic strain amplitude measured by e.g. LISA is given by h_char^2 = N/8*h_0^2 where N is number of cycles per year & divide by 8 to average over viewing angles
@@ -143,7 +143,7 @@ def bbh_gw_params(blackholes_binary, bh_binary_id_num_gw, smbh_mass, timestep_du
     blackholes_binary : AGNBinaryBlackHole
         Binary black hole parameters
     bh_binary_id_num_gw : numpy.ndarray
-        ID numbers of binaries with separations below :math:`\mathtt{min_bbh_gw_separation}` with :obj:`float` type
+        ID numbers of binaries with separations below :math:`\\mathtt{min_bbh_gw_separation}` with :obj:`float` type
     smbh_mass : float
         Mass [M_sun] of the SMBH
     timestep_duration_yr : float

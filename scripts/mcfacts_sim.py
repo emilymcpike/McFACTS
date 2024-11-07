@@ -507,7 +507,7 @@ def main():
             )
 
             # then migrate as usual
-            blackholes_pro.orb_a = migration.type1_migration(
+            blackholes_pro.orb_a = migration.type1_migration_single(
                 opts.smbh_mass,
                 blackholes_pro.orb_a,
                 blackholes_pro.mass,
@@ -594,7 +594,7 @@ def main():
             # and now stars
 
             # Locations
-            stars_pro.orb_a = migration.type1_migration(
+            stars_pro.orb_a = migration.type1_migration_single(
                 opts.smbh_mass,
                 stars_pro.orb_a,
                 stars_pro.mass,
@@ -712,7 +712,8 @@ def main():
 
                 # If there are binaries, evolve them
                 # Damp binary orbital eccentricity
-                eccentricity.orbital_bin_ecc_damping(
+
+                blackholes_binary = eccentricity.orbital_bin_ecc_damping(
                     opts.smbh_mass,
                     blackholes_binary,
                     disk_surface_density,
@@ -739,6 +740,7 @@ def main():
 
                     # Soften/ ionize binaries due to encounters with eccentric singletons
                     # Return 3 things: perturbed biary_bh_array, disk_bh_pro_orbs_a, disk_bh_pro_orbs_ecc
+
                     blackholes_binary = dynamics.circular_binaries_encounters_ecc_prograde(
                         opts.smbh_mass,
                         blackholes_pro.orb_a,
@@ -759,7 +761,7 @@ def main():
                     filing_cabinet.remove_id_num(bh_binary_id_num_unphysical_ecc)
 
                 # Harden binaries via gas
-                # Choose between Baruteau et al. 2011 gas hardening, or gas hardening from LANL simulations. To do: include dynamical hardening/softening from encounters
+                # Choose between Baruteau et al. 2011 gas hardening, or gas hardening from LANL simulations. To do: include dynamical hardening/softening from encounters                
                 blackholes_binary = evolve.bin_harden_baruteau(
                     blackholes_binary,
                     opts.smbh_mass,
@@ -813,6 +815,7 @@ def main():
                 if (opts.flag_dynamic_enc > 0):
                     # Recapture bins out of disk plane. 
                     # FIX THIS: Replace this with orb_inc_damping but for binary bhbh OBJECTS (KN)
+                    
                     blackholes_binary = dynamics.bin_recapture(
                         blackholes_binary,
                         opts.timestep_duration_yr
@@ -821,6 +824,7 @@ def main():
                 # Migrate binaries
                 # First if feedback present, find ratio of feedback heating torque to migration torque
                 if opts.flag_thermal_feedback > 0:
+                    
                     ratio_heat_mig_torques_bin_com = evolve.bin_com_feedback_hankla(
                         blackholes_binary,
                         disk_surface_density,
@@ -1084,6 +1088,7 @@ def main():
             close_encounters_id_num = blackholes_pro.id_num[close_encounters_indices]
 
             if (close_encounters_id_num.size > 0):
+
                 blackholes_binary, bh_binary_id_num_new = formation.add_to_binary_obj(
                     blackholes_binary,
                     blackholes_pro,

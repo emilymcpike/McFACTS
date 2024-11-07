@@ -6,7 +6,7 @@ import numpy as np
 import scipy
 
 
-def type1_migration_single(smbh_mass, disk_bh_orb_a_pro, disk_bh_mass_pro, disk_surf_density_func, disk_aspect_ratio_func, timestep_duration_yr, disk_feedback_ratio_func, disk_radius_trap, disk_bh_orb_ecc_pro, disk_bh_pro_orb_ecc_crit,disk_radius_outer):
+def type1_migration_single(smbh_mass, disk_bh_orb_a_pro, disk_bh_mass_pro, disk_surf_density_func, disk_aspect_ratio_func, timestep_duration_yr, disk_feedback_ratio_func, disk_radius_trap, disk_bh_orb_ecc_pro, disk_bh_pro_orb_ecc_crit, disk_radius_outer):
     """Calculates how far an object migrates in an AGN gas disk in a single timestep
 
     Assumes a gas disk surface density and aspect ratio profile, for objects of specified masses and
@@ -171,3 +171,34 @@ def type1_migration_single(smbh_mass, disk_bh_orb_a_pro, disk_bh_mass_pro, disk_
     return disk_bh_pro_a_new
 
 
+def type1_migration(smbh_mass, orbs_a, masses, orbs_ecc, orb_ecc_crit,
+                    disk_surf_density_func, disk_aspect_ratio_func, disk_feedback_ratio_func,
+                    disk_radius_trap, disk_radius_outer, timestep_duration_yr):
+    
+    # Get surface density function or process if just a float
+    if isinstance(disk_surf_density_func, float):
+        disk_surface_density = disk_surf_density_func
+    else:
+        disk_surface_density = disk_surf_density_func(orbs_a)
+    # Get aspect ratio function or process if just a float
+    if isinstance(disk_aspect_ratio_func, float):
+        disk_aspect_ratio = disk_aspect_ratio_func
+    else:
+        disk_aspect_ratio = disk_aspect_ratio_func(orbs_a)
+
+    # Migration only occurs for sufficiently damped orbital ecc. If orb_ecc <= ecc_crit, then migrate.
+    # Otherwise no change in semi-major axis (orb_a).
+    # Get indices of objects with orb_ecc <= ecc_crit so we can only update orb_a for those.
+    migration_indices = np.asarray(orbs_ecc <= orb_ecc_crit).nonzero()[0]
+    new_orbs_a = np.full(-100.5,migration_indices.shape)
+
+    # Compute migration timescale for each orbiter in seconds
+    # Eqn from Paardekooper 2014, rewritten for R in terms of r_g of SMBH = GM_SMBH/c^2
+    # tau = (pi/2) h^2/(q_d*q) * (1/Omega)
+    #   where h is aspect ratio, q is m/M_SMBH, q_d = pi R^2 disk_surface_density/M_SMBH
+    #   and Omega is the Keplerian orbital frequency around the SMBH
+    # Here smbh_mass/disk_bh_mass_pro are both in M_sun, so units cancel
+    # c, G and disk_surface_density in SI units
+    tau = ((disk_aspect_ratio**2.0)* scipy.constants.c/(3.0*scipy.constants.G) * (smbh_mass/disk_bh_mass_pro) / disk_surface_density) / np.sqrt(disk_bh_orb_a_pro)
+
+    return()
