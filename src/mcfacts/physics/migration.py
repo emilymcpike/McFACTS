@@ -6,7 +6,7 @@ import numpy as np
 import scipy
 
 
-def type1_migration(smbh_mass, disk_bh_orb_a_pro, disk_bh_mass_pro, disk_surf_density_func, disk_aspect_ratio_func, timestep_duration_yr, disk_feedback_ratio_func, disk_radius_trap, disk_bh_orb_ecc_pro, disk_bh_pro_orb_ecc_crit,disk_radius_outer):
+def type1_migration_single(smbh_mass, disk_bh_orb_a_pro, disk_bh_mass_pro, disk_surf_density_func, disk_aspect_ratio_func, timestep_duration_yr, disk_feedback_ratio_func, disk_radius_trap, disk_bh_orb_ecc_pro, disk_bh_pro_orb_ecc_crit,disk_radius_outer):
     """Calculates how far an object migrates in an AGN gas disk in a single timestep
 
     Assumes a gas disk surface density and aspect ratio profile, for objects of specified masses and
@@ -36,7 +36,7 @@ def type1_migration(smbh_mass, disk_bh_orb_a_pro, disk_bh_mass_pro, disk_surf_de
     disk_radius_trap : float
         Radius [r_{g,SMBH}] of disk migration trap
     disk_bh_orb_ecc_pro : numpy.ndarray
-        Orbital ecc [unitless]of prograde singleton BH at start of timestep :math:`\mathtt{disk_radius_trap}. Floor in orbital ecc given by e_crit.
+        Orbital ecc [unitless]of prograde singleton BH at start of timestep :math:`\\mathtt{disk_radius_trap}. Floor in orbital ecc given by e_crit.
     disk_bh_pro_orb_ecc_crit : float
         Critical value of orbital eccentricity [unitless] below which we assume Type 1 migration must occur. Do not damp orb ecc below this (e_crit=0.01 is default)
 
@@ -169,3 +169,5 @@ def type1_migration(smbh_mass, disk_bh_orb_a_pro, disk_bh_mass_pro, disk_surf_de
         raise RuntimeError("disk_bh_pro_a_new was not set properly; a case was missed")
 
     return disk_bh_pro_a_new
+
+
