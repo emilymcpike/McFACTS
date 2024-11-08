@@ -507,34 +507,26 @@ def main():
             )
 
             # then migrate as usual
-            blackholes_pro2 = blackholes_pro.copy()
+            #blackholes_pro2 = blackholes_pro.copy()
 
-            if (np.any(blackholes_pro.orb_a != blackholes_pro2.orb_a)):
-                print("orbs_a don't matchSDFDF")
-                #print("blackholes_pro.orb_a",blackholes_pro.orb_a)
-                #print("blackholes_pro2.orb_a",blackholes_pro2.orb_a)
-                print(ff)
-
-            #print("PRE MIG VALUES",blackholes_pro.orb_a)
-            blackholes_pro.orb_a = migration.type1_migration_single(
+            # blackholes_pro.orb_a = migration.type1_migration_single(
+            #     opts.smbh_mass,
+            #     blackholes_pro.orb_a,
+            #     blackholes_pro.mass,
+            #     disk_surface_density,
+            #     disk_aspect_ratio,
+            #     opts.timestep_duration_yr,
+            #     ratio_heat_mig_torques,
+            #     opts.disk_radius_trap,
+            #     blackholes_pro.orb_ecc,
+            #     opts.disk_bh_pro_orb_ecc_crit,
+            #     opts.disk_radius_outer,
+            # )
+            blackholes_pro.orb_a = migration.type1_migration_single_new(
                 opts.smbh_mass,
                 blackholes_pro.orb_a,
                 blackholes_pro.mass,
-                disk_surface_density,
-                disk_aspect_ratio,
-                opts.timestep_duration_yr,
-                ratio_heat_mig_torques,
-                opts.disk_radius_trap,
                 blackholes_pro.orb_ecc,
-                opts.disk_bh_pro_orb_ecc_crit,
-                opts.disk_radius_outer,
-            )
-            print("EEK")
-            blackholes_pro2.orb_a = migration.type1_migration_single_new(
-                opts.smbh_mass,
-                blackholes_pro2.orb_a,
-                blackholes_pro2.mass,
-                blackholes_pro2.orb_ecc,
                 opts.disk_bh_pro_orb_ecc_crit,
                 disk_surface_density,
                 disk_aspect_ratio,
@@ -543,22 +535,12 @@ def main():
                 opts.disk_radius_outer,
                 opts.timestep_duration_yr
             )
-            if (np.any(blackholes_pro.orb_a != blackholes_pro2.orb_a)):
-                print("orbs_a don't match")
-                #print("blackholes_pro.orb_a",blackholes_pro.orb_a)
-                #print("blackholes_pro2.orb_a",blackholes_pro2.orb_a)
-                unmatch_mask = ~(blackholes_pro.orb_a == blackholes_pro2.orb_a)
-                print("nonmatchy values 1",blackholes_pro.orb_a[unmatch_mask])
-                print("nonmatchy values 2",blackholes_pro2.orb_a[unmatch_mask])
-                print(ff)
-            print()
             # Check for orb_a unphysical
             bh_pro_id_num_unphysical_a = blackholes_pro.id_num[blackholes_pro.orb_a == 0.]
             if bh_pro_id_num_unphysical_a.size > 0:
                 # The binary has unphysical eccentricity. Delete
                 blackholes_pro.remove_id_num(bh_pro_id_num_unphysical_a)
                 filing_cabinet.remove_id_num(bh_pro_id_num_unphysical_a)
-
 
             # Accrete
             blackholes_pro.mass = accretion.change_bh_mass(
@@ -870,27 +852,11 @@ def main():
                     ratio_heat_mig_torques_bin_com = np.ones(blackholes_binary.num)
 
                 # Migrate binaries center of mass
-                blackholes_binary2 = blackholes_binary.copy()
-                blackholes_binary = evolve.bin_migration_obj(
-                    opts.smbh_mass,
-                    blackholes_binary,
-                    disk_surface_density,
-                    disk_aspect_ratio,
-                    opts.timestep_duration_yr,
-                    ratio_heat_mig_torques_bin_com,
-                    opts.disk_radius_trap,
+                blackholes_binary = migration.type1_migration_binary(
+                    opts.smbh_mass, blackholes_binary,
                     opts.disk_bh_pro_orb_ecc_crit,
-                    opts.disk_radius_outer
-                )
-
-                blackholes_binary2 = migration.type1_migration_binary(opts.smbh_mass, blackholes_binary2, opts.disk_bh_pro_orb_ecc_crit,
-                           disk_surface_density, disk_aspect_ratio, ratio_heat_mig_torques_bin_com,
-                           opts.disk_radius_trap, opts.disk_radius_outer, opts.timestep_duration_yr)
-                
-                if(np.any(blackholes_binary.bin_orb_a != blackholes_binary2.bin_orb_a)):
-                    print("bin_orb_a doesn't match")
-                    print("blackholes_binary.bin_orb_a",blackholes_binary.bin_orb_a)
-                    print("blackholes_binary2.bin_orb_a",blackholes_binary2.bin_orb_a)
+                    disk_surface_density, disk_aspect_ratio, ratio_heat_mig_torques_bin_com,
+                    opts.disk_radius_trap, opts.disk_radius_outer, opts.timestep_duration_yr)
 
                 # Test to see if any binaries separation is O(1r_g)
                 # If so, track them for GW freq, strain.
@@ -1224,7 +1190,6 @@ def main():
                 filing_cabinet.update(id_num=bh_id_num_pro_inner_disk,
                                       attr="disk_inner_outer",
                                       new_info=np.full(len(bh_id_num_pro_inner_disk), -1))
-
             # Check if any retrograde BHs are in the inner disk
             bh_id_num_retro_inner_disk = blackholes_retro.id_num[blackholes_retro.orb_a < opts.inner_disk_outer_radius]
             if (bh_id_num_retro_inner_disk.size > 0):

@@ -201,7 +201,7 @@ def circular_singles_encounters_prograde(
                         # drop ecc of a_i by 10% and drop a_i by 10% (P.E. = -GMm/a)
                         # if already pumped in eccentricity, no longer circular, so don't need to follow other interactions
                         if disk_bh_pro_orbs_ecc[indx_array[i]] <= disk_bh_pro_orb_ecc_crit:
-                            disk_bh_pro_orbs_ecc[indx_array[i]] = delta_energy_strong
+                            disk_bh_pro_orbs_ecc[indx_array[i]] = delta_energy_strong #BUG check if should be de_strong
                             disk_bh_pro_orbs_a[indx_array[i]] = disk_bh_pro_orbs_a[indx_array[i]]*(1.0 + delta_energy_strong)
                             disk_bh_pro_orbs_ecc[j] = disk_bh_pro_orbs_ecc[j]*(1 - delta_energy_strong)
                             disk_bh_pro_orbs_a[j] = disk_bh_pro_orbs_a[j]*(1 - delta_energy_strong)                        
@@ -421,7 +421,7 @@ def circular_binaries_encounters_ecc_prograde(
                     if hard > 0:
                         # Binary is hard w.r.t interloper
                         # Change binary parameters; decr separation, incr ecc around bin_orb_a and orb_ecc
-                        blackholes_binary.bin_sep[i] = blackholes_binary.bin_sep[i] * (1 - delta_energy_strong)
+                        blackholes_binary.bin_sep[i] = blackholes_binary.bin_sep[i] * (1 - delta_energy_strong) #BUG check if should be de_strong
                         blackholes_binary.bin_ecc[i] = blackholes_binary.bin_ecc[i] * (1 + delta_energy_strong)
                         blackholes_binary.bin_orb_ecc[i] = blackholes_binary.bin_orb_ecc[i] * (1 + delta_energy_strong)
                         # Change interloper parameters; increase a_ecc, increase e_ecc
@@ -679,8 +679,8 @@ def circular_binaries_encounters_circ_prograde(
                         # Binary is soft w.r.t. interloper
                         # Check to see if binary is ionized
                         # Change binary parameters; incr bin separation, decr ecc around com, incr orb_ecc
-                        blackholes_binary.bin_sep[i] = blackholes_binary.bin_sep[i] * (1 + delta_energy_strong)
-                        blackholes_binary.bin_ecc[i] = blackholes_binary.bin_ecc[i] * (1 - delta_energy_strong)
+                        blackholes_binary.bin_sep[i] = blackholes_binary.bin_sep[i] * (1 + delta_energy_strong) # BUG should this be de_strong?
+                        blackholes_binary.bin_ecc[i] = blackholes_binary.bin_ecc[i] * (1 - delta_energy_strong) # BUG should this be de_strong?
                         blackholes_binary.bin_orb_ecc[i] = blackholes_binary.bin_orb_ecc[i] * (1 + delta_energy_strong)
                         # Change interloper parameters; decrease a_ecc, decrease e_ecc
                         circ_prograde_population_locations[j] = circ_prograde_population_locations[j] * (1 - delta_energy_strong)
@@ -969,8 +969,8 @@ def bin_spheroid_encounter(
 
         # If hard < 0 binary is soft wrt interloper
         # Change binary parameters: increase separation, decrease ecc around bin_orb_a, increase orb_ecc
-        bin_sep[mask_soft] = bin_sep[mask_soft] * (1 + delta_energy_strong) #TODO this should be de_strong
-        bin_ecc[mask_soft] = bin_ecc[mask_soft] * (1 - delta_energy_strong) #TODO this should be de_strong
+        bin_sep[mask_soft] = bin_sep[mask_soft] * (1 + delta_energy_strong) #BUG this should be de_strong
+        bin_ecc[mask_soft] = bin_ecc[mask_soft] * (1 - delta_energy_strong) #BUG this should be de_strong
         bin_orb_ecc[mask_soft] = bin_orb_ecc[mask_soft] * (1 + delta_energy_strong)
 
         # Catch if bin_ecc or bin_orb_ecc >= 1

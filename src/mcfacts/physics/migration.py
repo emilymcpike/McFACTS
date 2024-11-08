@@ -60,20 +60,20 @@ def type1_migration_single(smbh_mass, disk_bh_orb_a_pro, disk_bh_mass_pro, disk_
     # Otherwise, no change in semi-major axis. Wait till orb ecc damped to <=e_crit.
     # Only show BH with orb ecc <=e_crit
     # BUG OUT LINE COMMENTED OUT
-    #disk_bh_orb_ecc_pro = np.ma.masked_where(disk_bh_orb_ecc_pro > disk_bh_pro_orb_ecc_crit, disk_bh_orb_ecc_pro)
-    disk_bh_mig = np.ma.masked_where(disk_bh_orb_ecc_pro > disk_bh_pro_orb_ecc_crit, disk_bh_orb_ecc_pro)
+    disk_bh_orb_ecc_pro = np.ma.masked_where(disk_bh_orb_ecc_pro > disk_bh_pro_orb_ecc_crit, disk_bh_orb_ecc_pro)
+    #disk_bh_mig = np.ma.masked_where(disk_bh_orb_ecc_pro > disk_bh_pro_orb_ecc_crit, disk_bh_orb_ecc_pro)
     # Those BH with orb ecc > e_crit
     disk_bh_not_mig = np.ma.masked_where(disk_bh_orb_ecc_pro <= disk_bh_pro_orb_ecc_crit, disk_bh_orb_ecc_pro)
     # Indices of BH with <=critical ecc
     # BUG OUT LINE COMMENTED OUT
-    #disk_bh_crit_ecc_pro_indices = np.ma.nonzero(disk_bh_mig)
-    disk_bh_crit_ecc_pro_indices = (~disk_bh_mig.mask)
+    disk_bh_crit_ecc_pro_indices = np.ma.nonzero(disk_bh_orb_ecc_pro)
+    #disk_bh_crit_ecc_pro_indices = (~disk_bh_mig.mask)
     # Indicies of BH with > critical ecc
     #print("not mig",disk_bh_not_mig)
     #print("ecc",disk_bh_orb_ecc_pro)
     #BUG OUT LINE COMMENTED OUT
-    #disk_bh_crit_ecc_not_mig = np.ma.nonzero(disk_bh_not_mig)
-    disk_bh_crit_ecc_not_mig = (~disk_bh_not_mig.mask)
+    disk_bh_crit_ecc_not_mig = np.ma.nonzero(disk_bh_not_mig)
+    #disk_bh_crit_ecc_not_mig = (~disk_bh_not_mig.mask)
 
     # Migration only if there are BH with e<=e_crit
     # if np.size(crit_ecc_prograde_indices) > 0:
@@ -190,10 +190,8 @@ def type1_migration(smbh_mass, orbs_a, masses, orbs_ecc, orb_ecc_crit,
     # Get indices of objects with orb_ecc <= ecc_crit so we can only update orb_a for those.
     migration_indices = np.asarray(orbs_ecc <= orb_ecc_crit).nonzero()[0]
     non_migration_indices = np.asarray(orbs_ecc > orb_ecc_crit).nonzero()[0]
-    print("NEW not mig", non_migration_indices)
     # If nothing will migrate then end the function
     if migration_indices.shape == (0,):
-        print("return???")
         # BUG it shouldn't work like this
         orbs_a[orbs_a > disk_radius_outer] = disk_radius_outer
         return (orbs_a)
@@ -233,7 +231,6 @@ def type1_migration(smbh_mass, orbs_a, masses, orbs_ecc, orb_ecc_crit,
 
     # Get mask for objects where feedback_ratio <1; these still migrate inwards, but more slowly
     mask_mig_in = disk_feedback_ratio < 1
-    print("NEW pre-mig inward",new_orbs_a[mask_mig_in])
     if (np.sum(mask_mig_in) > 0):
         # If outside trap migrate inwards
         temp_orbs_a = new_orbs_a[mask_mig_in & mask_out_trap] - migration_distance[mask_mig_in & mask_out_trap] * (1 - disk_feedback_ratio[mask_mig_in & mask_out_trap])
@@ -248,23 +245,18 @@ def type1_migration(smbh_mass, orbs_a, masses, orbs_ecc, orb_ecc_crit,
         temp_orbs_a[temp_orbs_a >= disk_radius_trap] = disk_radius_trap
         #print("new",temp_orbs_a)
         new_orbs_a[mask_mig_in & mask_in_trap] = temp_orbs_a
-    print("NEW post-mig inward",new_orbs_a[mask_mig_in])
-
 
     # Get mask for objects where feedback_ratio > 1: these migrate outwards
     mask_mig_out = disk_feedback_ratio > 1
-    print("NEW pre-mig outward",new_orbs_a[mask_mig_out])
     if (np.sum(mask_mig_out) > 0):
         #temp_orbs_a = new_orbs_a[mask_mig_out] + migration_distance[mask_mig_out] * (disk_feedback_ratio_func[mask_mig_out] - 1)
         # Catch to keep objects from leaving the outer radius of the disk
         #temp_orbs_a[temp_orbs_a > disk_radius_outer] = disk_radius_outer
         #new_orbs_a[mask_mig_out] = temp_orbs_a
         new_orbs_a[mask_mig_out] = new_orbs_a[mask_mig_out] + migration_distance[mask_mig_out] * (disk_feedback_ratio[mask_mig_out] - 1)
-    print("NEW post-mig outward",new_orbs_a[mask_mig_out])
 
     # Get mask for objects where feedback_ratio == 1. Shouldn't happen if feedback = 1 (on), but will happen if feedback = 0 (off)
     mask_mig_stay = disk_feedback_ratio == 1
-    print("NEW pre-mig stay",new_orbs_a[mask_mig_stay])
     if (np.sum(mask_mig_stay) > 0):
         # If outside trap migrate inwards
         temp_orbs_a = new_orbs_a[mask_mig_stay & mask_out_trap] - migration_distance[mask_mig_stay & mask_out_trap]
@@ -277,7 +269,6 @@ def type1_migration(smbh_mass, orbs_a, masses, orbs_ecc, orb_ecc_crit,
         # If migration takes object outside trap, fix at trap
         temp_orbs_a[temp_orbs_a >= disk_radius_trap] = disk_radius_trap
         new_orbs_a[mask_mig_stay & mask_in_trap] = temp_orbs_a
-    print("NEW post-mig stay",new_orbs_a[mask_mig_stay])
 
     # Assert that things cannot migrate out of the disk
     new_orbs_a[new_orbs_a > disk_radius_outer] = disk_radius_outer
