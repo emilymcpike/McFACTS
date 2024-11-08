@@ -507,22 +507,7 @@ def main():
             )
 
             # then migrate as usual
-            #blackholes_pro2 = blackholes_pro.copy()
-
-            # blackholes_pro.orb_a = migration.type1_migration_single(
-            #     opts.smbh_mass,
-            #     blackholes_pro.orb_a,
-            #     blackholes_pro.mass,
-            #     disk_surface_density,
-            #     disk_aspect_ratio,
-            #     opts.timestep_duration_yr,
-            #     ratio_heat_mig_torques,
-            #     opts.disk_radius_trap,
-            #     blackholes_pro.orb_ecc,
-            #     opts.disk_bh_pro_orb_ecc_crit,
-            #     opts.disk_radius_outer,
-            # )
-            blackholes_pro.orb_a = migration.type1_migration_single_new(
+            blackholes_pro.orb_a = migration.type1_migration_single(
                 opts.smbh_mass,
                 blackholes_pro.orb_a,
                 blackholes_pro.mass,
@@ -608,19 +593,19 @@ def main():
             # and now stars
 
             # Locations
-            # stars_pro.orb_a = migration.type1_migration_single(
-            #     opts.smbh_mass,
-            #     stars_pro.orb_a,
-            #     stars_pro.mass,
-            #     disk_surface_density,
-            #     disk_aspect_ratio,
-            #     opts.timestep_duration_yr,
-            #     ratio_heat_mig_stars_torques,
-            #     opts.disk_radius_trap,
-            #     stars_pro.orb_ecc,
-            #     opts.disk_bh_pro_orb_ecc_crit,
-            #     opts.disk_radius_outer,
-            # )
+            stars_pro.orb_a = migration.type1_migration_single(
+                opts.smbh_mass,
+                stars_pro.orb_a,
+                stars_pro.mass,
+                stars.orb_ecc,
+                opts.disk_bh_pro_orb_ecc_crit,
+                disk_surface_density,
+                disk_aspect_ratio,
+                ratio_heat_mig_stars_torques,
+                opts.disk_radius_trap,
+                opts.disk_radius_outer,
+                opts.timestep_duration_yr,
+            )
 
             # Accrete
             stars_pro.mass = accretion.change_star_mass(
