@@ -507,6 +507,15 @@ def main():
             )
 
             # then migrate as usual
+            blackholes_pro2 = blackholes_pro.copy()
+
+            if (np.any(blackholes_pro.orb_a != blackholes_pro2.orb_a)):
+                print("orbs_a don't matchSDFDF")
+                #print("blackholes_pro.orb_a",blackholes_pro.orb_a)
+                #print("blackholes_pro2.orb_a",blackholes_pro2.orb_a)
+                print(ff)
+
+            #print("PRE MIG VALUES",blackholes_pro.orb_a)
             blackholes_pro.orb_a = migration.type1_migration_single(
                 opts.smbh_mass,
                 blackholes_pro.orb_a,
@@ -520,6 +529,29 @@ def main():
                 opts.disk_bh_pro_orb_ecc_crit,
                 opts.disk_radius_outer,
             )
+            print("EEK")
+            blackholes_pro2.orb_a = migration.type1_migration_single_new(
+                opts.smbh_mass,
+                blackholes_pro2.orb_a,
+                blackholes_pro2.mass,
+                blackholes_pro2.orb_ecc,
+                opts.disk_bh_pro_orb_ecc_crit,
+                disk_surface_density,
+                disk_aspect_ratio,
+                ratio_heat_mig_torques,
+                opts.disk_radius_trap,
+                opts.disk_radius_outer,
+                opts.timestep_duration_yr
+            )
+            if (np.any(blackholes_pro.orb_a != blackholes_pro2.orb_a)):
+                print("orbs_a don't match")
+                #print("blackholes_pro.orb_a",blackholes_pro.orb_a)
+                #print("blackholes_pro2.orb_a",blackholes_pro2.orb_a)
+                unmatch_mask = ~(blackholes_pro.orb_a == blackholes_pro2.orb_a)
+                print("nonmatchy values 1",blackholes_pro.orb_a[unmatch_mask])
+                print("nonmatchy values 2",blackholes_pro2.orb_a[unmatch_mask])
+                print(ff)
+            print()
             # Check for orb_a unphysical
             bh_pro_id_num_unphysical_a = blackholes_pro.id_num[blackholes_pro.orb_a == 0.]
             if bh_pro_id_num_unphysical_a.size > 0:
@@ -594,19 +626,19 @@ def main():
             # and now stars
 
             # Locations
-            stars_pro.orb_a = migration.type1_migration_single(
-                opts.smbh_mass,
-                stars_pro.orb_a,
-                stars_pro.mass,
-                disk_surface_density,
-                disk_aspect_ratio,
-                opts.timestep_duration_yr,
-                ratio_heat_mig_stars_torques,
-                opts.disk_radius_trap,
-                stars_pro.orb_ecc,
-                opts.disk_bh_pro_orb_ecc_crit,
-                opts.disk_radius_outer,
-            )
+            # stars_pro.orb_a = migration.type1_migration_single(
+            #     opts.smbh_mass,
+            #     stars_pro.orb_a,
+            #     stars_pro.mass,
+            #     disk_surface_density,
+            #     disk_aspect_ratio,
+            #     opts.timestep_duration_yr,
+            #     ratio_heat_mig_stars_torques,
+            #     opts.disk_radius_trap,
+            #     stars_pro.orb_ecc,
+            #     opts.disk_bh_pro_orb_ecc_crit,
+            #     opts.disk_radius_outer,
+            # )
 
             # Accrete
             stars_pro.mass = accretion.change_star_mass(

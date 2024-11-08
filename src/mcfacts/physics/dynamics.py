@@ -1019,7 +1019,7 @@ def bin_recapture(blackholes_binary, timestep_duration_yr):
 
     if (idx_gtr_0.shape[0] == 0):
         return (blackholes_binary)
-    
+
     bin_orb_inc = blackholes_binary.bin_orb_inc[idx_gtr_0]
     bin_mass = blackholes_binary.mass_1[idx_gtr_0] + blackholes_binary.mass_2[idx_gtr_0]
     bin_orb_a = blackholes_binary.bin_orb_a[idx_gtr_0]
@@ -1034,6 +1034,7 @@ def bin_recapture(blackholes_binary, timestep_duration_yr):
     blackholes_binary.bin_orb_inc[idx_gtr_0] = bin_orb_inc
 
     return (blackholes_binary)
+
 
 def bh_near_smbh(
         smbh_mass,
@@ -1100,5 +1101,5 @@ def bh_near_smbh(
     new_location_r_g[new_location_r_g < 1.] = 1.
     # Only update when less than min_safe_distance
     new_disk_bh_pro_orbs_a[disk_bh_pro_orbs_a < min_safe_distance] = new_location_r_g
-    
+
     return new_disk_bh_pro_orbs_a
