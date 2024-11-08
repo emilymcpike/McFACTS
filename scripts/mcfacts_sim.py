@@ -589,7 +589,6 @@ def main():
                 blackholes_retro.remove_id_num(bh_retro_id_num_unphysical_ecc)
                 filing_cabinet.remove_id_num(bh_retro_id_num_unphysical_ecc)
 
-
             # and now stars
 
             # Locations
@@ -934,7 +933,7 @@ def main():
 
                     # Update filing cabinet
                     filing_cabinet.add_objects(
-                        new_id_num=np.arange(filing_cabinet.id_max+1, filing_cabinet.id_max + 1 + bh_binary_id_num_ionization.size * 2, 1),
+                        new_id_num=np.arange(filing_cabinet.id_max + 1, filing_cabinet.id_max + 1 + bh_binary_id_num_ionization.size * 2, 1),
                         new_category=np.zeros(bh_binary_id_num_ionization.size * 2),
                         new_orb_a=np.concatenate([
                             blackholes_binary.at_id_num(bh_binary_id_num_ionization, "orb_a_1"),
@@ -1046,11 +1045,11 @@ def main():
                         
                         # Update filing cabinet
                         filing_cabinet.update(id_num=bh_binary_id_num_merger,
-                                            attr="category",
-                                            new_info=np.full(bh_binary_id_num_merger.size, 0))
+                                              attr="category",
+                                              new_info=np.full(bh_binary_id_num_merger.size, 0))
                         filing_cabinet.update(id_num=bh_binary_id_num_merger,
-                                            attr="size",
-                                            new_info=np.full(bh_binary_id_num_merger.size, -1.5))
+                                              attr="size",
+                                              new_info=np.full(bh_binary_id_num_merger.size, -1.5))
                         blackholes_binary.remove_id_num(bh_binary_id_num_merger)
 
                     # Append new merged BH to arrays of single BH locations, masses, spins, spin angles & gens
@@ -1225,7 +1224,6 @@ def main():
                     agn_redshift
                 )
 
-
             if blackholes_inner_disk.num > 0:
                 blackholes_emris.add_blackholes(new_mass=blackholes_inner_disk.mass,
                                                 new_spin=blackholes_inner_disk.spin,
@@ -1242,7 +1240,7 @@ def main():
                                                 new_time_passed=np.full(emri_gw_freq.size, time_passed),
                                                 new_id_num=blackholes_inner_disk.id_num)
 
-            #merger_dist = 1.0
+            # merger_dist = 1.0
             emri_merger_id_num = blackholes_inner_disk.id_num[blackholes_inner_disk.orb_a <= opts.disk_inner_stable_circ_orb]
 
             # if mergers occurs, remove from inner_disk arrays and stop evolving
@@ -1323,7 +1321,7 @@ def main():
 
         # Update filing_cabinet
         filing_cabinet.add_objects(
-            new_id_num=np.arange(filing_cabinet.id_max+1, filing_cabinet.id_max + 1 + blackholes_binary.num * 2, 1),
+            new_id_num=np.arange(filing_cabinet.id_max + 1, filing_cabinet.id_max + 1 + blackholes_binary.num * 2, 1),
             new_category=np.zeros(blackholes_binary.num * 2),
             new_orb_a=np.concatenate([blackholes_binary.orb_a_1, blackholes_binary.orb_a_2]),
             new_mass=np.concatenate([blackholes_binary.mass_1, blackholes_binary.mass_1]),
