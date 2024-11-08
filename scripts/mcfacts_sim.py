@@ -690,7 +690,6 @@ def main():
                     opts.disk_bh_pro_orb_ecc_crit,
                     opts.delta_energy_strong,
                 )
-
                 stars_pro.orb_a, stars_pro.orb_ecc = dynamics.circular_singles_encounters_prograde(
                     opts.smbh_mass,
                     stars_pro.orb_a,

@@ -205,7 +205,7 @@ def merged_mass(masses_1, masses_2, spins_1, spins_2):
 
     total_masses = masses_1 + masses_2
     total_spins = spins_1 + spins_2
-    nu_factors = (1.0 + mass_ratios)**2.0
+    nu_factors = (1.0 + mass_ratios) ** 2.0
     nu = mass_ratios / nu_factors
     nu_squared = nu * nu
 
@@ -246,12 +246,12 @@ def merged_spin(masses_1, masses_2, spins_1, spins_2):
 
     mass_ratios_inv = 1.0 / mass_ratios
 
-    nu_factors = 1.0 + mass_ratios**2.0
+    nu_factors = 1.0 + (mass_ratios ** 2.0)
     nu = mass_ratios / nu_factors
     nu_squared = nu * nu
 
-    spin_factors_1 = (0.632 + mass_ratios_inv)**2.0
-    spin_factors_2 = (0.632 + mass_ratios)**2.0
+    spin_factors_1 = (0.632 + mass_ratios_inv) ** 2.0
+    spin_factors_2 = (0.632 + mass_ratios) ** 2.0
 
     merged_spins = 0.686 * ((5.04 * nu) - (4.16 * nu_squared)) + (0.4 * ((spins_1 / spin_factors_1) + (spins_2 / spin_factors_2)))
 

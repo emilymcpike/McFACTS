@@ -84,7 +84,7 @@ def type1_migration_single(smbh_mass, disk_bh_orb_a_pro, disk_bh_mass_pro, disk_
     #   and Omega is the Keplerian orbital frequency around the SMBH
     # here smbh_mass/disk_bh_mass_pro are both in M_sun, so units cancel
     # c, G and disk_surface_density in SI units
-    tau = ((disk_aspect_ratio**2)* scipy.constants.c/(3.0*scipy.constants.G) * (smbh_mass/disk_bh_mass_pro) / disk_surface_density) / np.sqrt(disk_bh_orb_a_pro)
+    tau = ((disk_aspect_ratio ** 2)* scipy.constants.c/(3.0*scipy.constants.G) * (smbh_mass/disk_bh_mass_pro) / disk_surface_density) / np.sqrt(disk_bh_orb_a_pro)
     # ratio of timestep to tau_mig (timestep in years so convert)
     dt = timestep_duration_yr * scipy.constants.year / tau
     # migration distance is original locations times fraction of tau_mig elapsed
@@ -219,7 +219,7 @@ def type1_migration(smbh_mass, orbs_a, masses, orbs_ecc, orb_ecc_crit,
     #   and Omega is the Keplerian orbital frequency around the SMBH
     # Here smbh_mass/disk_bh_mass_pro are both in M_sun, so units cancel
     # c, G and disk_surface_density in SI units
-    tau = ((disk_aspect_ratio**2.0) * scipy.constants.c / (3.0 * scipy.constants.G) * (smbh_mass/masses[migration_indices]) / disk_surface_density) / np.sqrt(new_orbs_a)
+    tau = ((disk_aspect_ratio ** 2.0) * scipy.constants.c / (3.0 * scipy.constants.G) * (smbh_mass/masses[migration_indices]) / disk_surface_density) / np.sqrt(new_orbs_a)
     # ratio of timestep to tau_mig (timestep in years so convert)
     dt = timestep_duration_yr * scipy.constants.year / tau
     # migration distance is original locations times fraction of tau_mig elapsed

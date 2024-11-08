@@ -230,7 +230,7 @@ def bin_com_feedback_hankla(blackholes_binary, disk_surface_density, disk_opacit
     # Define kappa (or set up a function to call). 
     disk_opacity = disk_opacity_func(blackholes_binary.bin_orb_a)
 
-    ratio_heat_mig_torques_bin_com = 0.07 * (1 / disk_opacity) * (disk_alpha_viscosity**-1.5) * disk_bh_eddington_ratio * np.sqrt(blackholes_binary.bin_orb_a) / disk_surface_density_at_location
+    ratio_heat_mig_torques_bin_com = 0.07 * (1 / disk_opacity) * (disk_alpha_viscosity ** -1.5) * disk_bh_eddington_ratio * np.sqrt(blackholes_binary.bin_orb_a) / disk_surface_density_at_location
 
     ratio_heat_mig_torques_bin_com[blackholes_binary.bin_orb_a > disk_radius_outer] = np.ones(np.sum(blackholes_binary.bin_orb_a > disk_radius_outer))
 
@@ -294,7 +294,7 @@ def bin_migration(smbh_mass, disk_bin_bhbh_pro_array, disk_surf_model, disk_aspe
         disk_aspect_ratio = disk_aspect_ratio_model(bin_com)
 
     # This is an exact copy of mcfacts.physics.migration.type1.type1.
-    tau_mig = ((disk_aspect_ratio**2)* scipy.constants.c/(3.0*scipy.constants.G) * (smbh_mass/bin_mass) / disk_surface_density) / np.sqrt(bin_com)
+    tau_mig = ((disk_aspect_ratio ** 2) * scipy.constants.c / (3.0 * scipy.constants.G) * (smbh_mass / bin_mass) / disk_surface_density) / np.sqrt(bin_com)
     # ratio of timestep_duration_yr to tau_mig (timestep_duration_yr in years so convert)
     dt = timestep_duration_yr * scipy.constants.year / tau_mig
     # migration distance is original locations times fraction of tau_mig elapsed
@@ -315,13 +315,13 @@ def bin_migration(smbh_mass, disk_bin_bhbh_pro_array, disk_surf_model, disk_aspe
             actual_index = index_inwards_modified[i]
             # If outside trap, migrates inwards
             if critical_distance > disk_radius_trap:
-                disk_bin_bhbh_pro_orbs_a[actual_index] = bin_com[actual_index] - (migration_distance[actual_index]*(1-feedback_ratio[actual_index]))
+                disk_bin_bhbh_pro_orbs_a[actual_index] = bin_com[actual_index] - (migration_distance[actual_index] * (1 - feedback_ratio[actual_index]))
                 #If inward migration takes object inside trap, fix at trap.
                 if disk_bin_bhbh_pro_orbs_a[actual_index] <= disk_radius_trap:
                     disk_bin_bhbh_pro_orbs_a[actual_index] = disk_radius_trap
             #If inside trap, migrates out
             if critical_distance < disk_radius_trap:
-                disk_bin_bhbh_pro_orbs_a[actual_index] = bin_com[actual_index] + (migration_distance[actual_index]*(1-feedback_ratio[actual_index]))
+                disk_bin_bhbh_pro_orbs_a[actual_index] = bin_com[actual_index] + (migration_distance[actual_index] * (1 - feedback_ratio[actual_index]))
                 if disk_bin_bhbh_pro_orbs_a[actual_index] >= disk_radius_trap:
                     disk_bin_bhbh_pro_orbs_a[actual_index] = disk_radius_trap
             #If at trap, stays there
@@ -332,7 +332,7 @@ def bin_migration(smbh_mass, disk_bin_bhbh_pro_array, disk_surf_model, disk_aspe
     index_outwards_modified = np.where(feedback_ratio >1)[0]
 
     if index_outwards_modified.size > 0:
-        disk_bin_bhbh_pro_orbs_a[index_outwards_modified] = bin_com[index_outwards_modified] +(migration_distance[index_outwards_modified]*(feedback_ratio[index_outwards_modified]-1))
+        disk_bin_bhbh_pro_orbs_a[index_outwards_modified] = bin_com[index_outwards_modified] + (migration_distance[index_outwards_modified] * (feedback_ratio[index_outwards_modified]-1))
         # catch to keep stuff from leaving the outer radius of the disk!
         disk_bin_bhbh_pro_orbs_a[index_outwards_modified[np.where(disk_bin_bhbh_pro_orbs_a[index_outwards_modified] > disk_radius_outer)]] = disk_radius_outer
 
@@ -475,9 +475,9 @@ def bin_ionization_check(blackholes_binary, smbh_mass):
 
     # bin_orb_a is in units of r_g of the SMBH = GM_smbh/c^2
     mass_ratio = blackholes_binary.mass_total/smbh_mass
-    hill_sphere = blackholes_binary.bin_orb_a * ((mass_ratio / 3)**(1. / 3.))
+    hill_sphere = blackholes_binary.bin_orb_a * ((mass_ratio / 3) ** (1. / 3.))
 
-    bh_id_nums = blackholes_binary.id_num[np.where(blackholes_binary.bin_sep > (frac_rhill*hill_sphere))[0]]
+    bh_id_nums = blackholes_binary.id_num[np.where(blackholes_binary.bin_sep > (frac_rhill * hill_sphere))[0]]
 
     return (bh_id_nums)
 
@@ -601,15 +601,15 @@ def bin_harden_baruteau(blackholes_binary, smbh_mass, timestep_duration_yr,
     bin_orb_ecc = blackholes_binary.bin_ecc[idx_non_mergers]
 
     # Find eccentricity factor (1-e_b^2)^7/2
-    ecc_factor_1 = ((1 - (bin_orb_ecc**2.0))**3.5)
+    ecc_factor_1 = ((1 - (bin_orb_ecc ** 2.0)) ** 3.5)
     # and eccentricity factor [1+(73/24)e_b^2+(37/96)e_b^4]
-    ecc_factor_2 = 1 + ((73/24) * (bin_orb_ecc**2.0)) + ((37/96) * (bin_orb_ecc**4.0))
+    ecc_factor_2 = 1 + ((73/24) * (bin_orb_ecc ** 2.0)) + ((37/96) * (bin_orb_ecc ** 4.0))
     # overall ecc factor = ecc_factor_1/ecc_factor_2
     ecc_factor = ecc_factor_1/ecc_factor_2
 
     # Binary period = 2pi*sqrt((delta_r)^3/GM_bin)
     # or T_orb = 10^7s*(1r_g/m_smmbh=10^8Msun)^(3/2) *(M_bin/10Msun)^(-1/2) = 0.32yrs
-    bin_period = 0.32 * (bin_sep**1.5) * ((smbh_mass/1.e8)**1.5) * ((mass_binary/10.0)**-0.5)
+    bin_period = 0.32 * (bin_sep ** 1.5) * ((smbh_mass/1.e8) ** 1.5) * ((mass_binary/10.0) ** -0.5)
 
     # Find how many binary orbits in timestep. Binary separation is halved for every 10^3 orbits.
     num_orbits_in_timestep = np.zeros(len(bin_period))
@@ -617,7 +617,7 @@ def bin_harden_baruteau(blackholes_binary, smbh_mass, timestep_duration_yr,
     scaled_num_orbits = num_orbits_in_timestep / 1000.0
 
     # Timescale for binary merger via GW emission alone, scaled to bin parameters
-    time_to_merger_gw = time_gw_normalization*((bin_sep)**(4.0))*((mass_binary/10.0)**(-2))*((mass_reduced/2.5)**(-1.0))*ecc_factor
+    time_to_merger_gw = time_gw_normalization * ((bin_sep ** 4.0)) * ((mass_binary/10.0) ** -2) * ((mass_reduced / 2.5) ** -1.0) * ecc_factor
     # Finite check
     assert np.isfinite(time_to_merger_gw).all(),\
         "Finite check failure: time_to_merger_gw"
@@ -625,7 +625,7 @@ def bin_harden_baruteau(blackholes_binary, smbh_mass, timestep_duration_yr,
 
     # Binary will not merge in this timestep
     # new bin_sep according to Baruteu+11 prescription
-    bin_sep[time_to_merger_gw > timestep_duration_yr] = bin_sep[time_to_merger_gw > timestep_duration_yr] * (0.5**scaled_num_orbits[time_to_merger_gw > timestep_duration_yr])
+    bin_sep[time_to_merger_gw > timestep_duration_yr] = bin_sep[time_to_merger_gw > timestep_duration_yr] * (0.5 ** scaled_num_orbits[time_to_merger_gw > timestep_duration_yr])
     blackholes_binary.bin_sep[idx_non_mergers[time_to_merger_gw > timestep_duration_yr]] = bin_sep[time_to_merger_gw > timestep_duration_yr]
     # Finite check
     assert np.isfinite(blackholes_binary.bin_sep).all(),\
