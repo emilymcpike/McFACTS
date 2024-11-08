@@ -74,7 +74,6 @@ def type1_migration_single(smbh_mass, disk_bh_orb_a_pro, disk_bh_mass_pro, disk_
     #BUG OUT LINE COMMENTED OUT
     #disk_bh_crit_ecc_not_mig = np.ma.nonzero(disk_bh_not_mig)
     disk_bh_crit_ecc_not_mig = (~disk_bh_not_mig.mask)
-    print("disk_bh_not_mig",disk_bh_not_mig)
 
     # Migration only if there are BH with e<=e_crit
     # if np.size(crit_ecc_prograde_indices) > 0:
@@ -92,7 +91,6 @@ def type1_migration_single(smbh_mass, disk_bh_orb_a_pro, disk_bh_mass_pro, disk_
     disk_bh_dist_mig = disk_bh_orb_a_pro * dt
     # Mask migration distance with zeros if orb ecc >= e_crit.
     disk_bh_dist_mig[disk_bh_crit_ecc_not_mig] = 0.
-    print("not mig",disk_bh_crit_ecc_not_mig)
 
     # Feedback provides a universal modification of migration distance
     # If feedback off, then feedback_ratio= ones and migration is unchanged
@@ -104,10 +102,6 @@ def type1_migration_single(smbh_mass, disk_bh_orb_a_pro, disk_bh_mass_pro, disk_
     # feedback ratio is a tuple, so need [0] part not [1] part (ie indices not details of array)
     disk_bh_mig_inward_mod = np.where(disk_feedback_ratio_func < 1)[0]
     disk_bh_mig_inward_all = disk_bh_orb_a_pro[disk_bh_mig_inward_mod]
-    intersection = np.intersect1d(disk_bh_mig_inward_mod,disk_bh_crit_ecc_pro_indices)
-    print("OLD pre-mig inward",disk_bh_orb_a_pro[intersection])
-
-    print("mig dist in",disk_bh_dist_mig[disk_bh_mig_inward_mod])
 
     # Given a population migrating inwards
     if disk_bh_mig_inward_mod.size > 0:
@@ -135,27 +129,18 @@ def type1_migration_single(smbh_mass, disk_bh_orb_a_pro, disk_bh_mass_pro, disk_
             # Something wrong has happened
             else:
                 raise RuntimeError("Forbidden case")
-    print("OLD post-mig inward",disk_bh_pro_a_new[intersection])
 
     # Find indices of objects where feedback ratio >1; these migrate outwards.
     # In Sirko & Goodman (2003) disk model this is well outside migration trap region.
     disk_bh_mig_outward_mod = np.where(disk_feedback_ratio_func >1)[0]
-    intersection = np.intersect1d(disk_bh_mig_outward_mod,disk_bh_crit_ecc_pro_indices)
-    print("OLD pre-mig outward",disk_bh_orb_a_pro[intersection])
-    print("mig dist out",disk_bh_dist_mig[disk_bh_mig_outward_mod])
-
 
     if disk_bh_mig_outward_mod.size > 0:
         disk_bh_pro_a_new[disk_bh_mig_outward_mod] = disk_bh_orb_a_pro[disk_bh_mig_outward_mod] +(disk_bh_dist_mig[disk_bh_mig_outward_mod]*(disk_feedback_ratio_func[disk_bh_mig_outward_mod]-1))
         # catch to keep stuff from leaving the outer radius of the disk
         disk_bh_pro_a_new[disk_bh_mig_outward_mod[np.where(disk_bh_pro_a_new[disk_bh_mig_outward_mod] > disk_radius_outer)]] = disk_radius_outer
-    print("OLD post-mig outward",disk_bh_pro_a_new[intersection])
 
     # Find indices where feedback ratio is identically 1; shouldn't happen (edge case) if feedback on, but == 1 if feedback off.
     disk_bh_mig_unchanged = np.where(disk_feedback_ratio_func == 1)[0]
-    intersection = np.intersect1d(disk_bh_mig_unchanged,disk_bh_crit_ecc_pro_indices)
-    print("OLD pre-mig unchanged",disk_bh_orb_a_pro[intersection])
-    print("mig dist stay",disk_bh_dist_mig[disk_bh_mig_unchanged])
 
     if disk_bh_mig_unchanged.size > 0:
         # If BH location > trap radius, migrate inwards
@@ -173,8 +158,6 @@ def type1_migration_single(smbh_mass, disk_bh_orb_a_pro, disk_bh_mass_pro, disk_
                 # if new location is >= trap radius, set location to trap radius
                 if disk_bh_pro_a_new[disk_bh_mig_unchanged_index] >= disk_radius_trap:
                     disk_bh_pro_a_new[disk_bh_mig_unchanged_index] = disk_radius_trap
-
-    print("OLD post-mig unchanged",disk_bh_pro_a_new[intersection])
 
     # print("bh new locations",np.sort(bh_new_locations))
     # print('migration distance2',migration_distance, prograde_bh_orb_ecc)
@@ -315,3 +298,18 @@ def type1_migration_single_new(smbh_mass, orbs_a, masses, orbs_ecc, orb_ecc_crit
                                  disk_radius_trap, disk_radius_outer, timestep_duration_yr)
 
     return (new_orbs_a)
+
+
+def type1_migration_binary(smbh_mass, blackholes_binary, orb_ecc_crit,
+                           disk_surf_density_func, disk_aspect_ratio_func, disk_feedback_ratio_func,
+                           disk_radius_trap, disk_radius_outer, timestep_duration_yr):
+
+    orbs_a = blackholes_binary.bin_orb_a
+    masses = blackholes_binary.mass_1 + blackholes_binary.mass_2
+    orbs_ecc = blackholes_binary.bin_orb_ecc
+
+    blackholes_binary.bin_orb_a = type1_migration(smbh_mass, orbs_a, masses, orbs_ecc, orb_ecc_crit,
+                                                  disk_surf_density_func, disk_aspect_ratio_func, disk_feedback_ratio_func,
+                                                  disk_radius_trap, disk_radius_outer, timestep_duration_yr)
+
+    return (blackholes_binary)

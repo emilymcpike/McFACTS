@@ -870,6 +870,7 @@ def main():
                     ratio_heat_mig_torques_bin_com = np.ones(blackholes_binary.num)
 
                 # Migrate binaries center of mass
+                blackholes_binary2 = blackholes_binary.copy()
                 blackholes_binary = evolve.bin_migration_obj(
                     opts.smbh_mass,
                     blackholes_binary,
@@ -881,6 +882,15 @@ def main():
                     opts.disk_bh_pro_orb_ecc_crit,
                     opts.disk_radius_outer
                 )
+
+                blackholes_binary2 = migration.type1_migration_binary(opts.smbh_mass, blackholes_binary2, opts.disk_bh_pro_orb_ecc_crit,
+                           disk_surface_density, disk_aspect_ratio, ratio_heat_mig_torques_bin_com,
+                           opts.disk_radius_trap, opts.disk_radius_outer, opts.timestep_duration_yr)
+                
+                if(np.any(blackholes_binary.bin_orb_a != blackholes_binary2.bin_orb_a)):
+                    print("bin_orb_a doesn't match")
+                    print("blackholes_binary.bin_orb_a",blackholes_binary.bin_orb_a)
+                    print("blackholes_binary2.bin_orb_a",blackholes_binary2.bin_orb_a)
 
                 # Test to see if any binaries separation is O(1r_g)
                 # If so, track them for GW freq, strain.
