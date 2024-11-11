@@ -150,19 +150,23 @@ def circular_singles_encounters_prograde(
     """
 
     # Set up new_disk_bh_pro_orbs_ecc
-    new_disk_bh_pro_orbs_ecc=np.empty_like(disk_bh_pro_orbs_ecc)
+    #new_disk_bh_pro_orbs_ecc=np.empty_like(disk_bh_pro_orbs_ecc)
 
     # Calculate & normalize all the parameters above in t_damp
     # E.g. normalize q=bh_mass/smbh_mass to 10^-7
-    mass_ratio = disk_bh_pro_masses/smbh_mass
+    #mass_ratio = disk_bh_pro_masses/smbh_mass
 
     # Find the e< crit_ecc. population. These are the (circularized) population that can form binaries.
-    circ_prograde_population = np.ma.masked_where(disk_bh_pro_orbs_ecc > disk_bh_pro_orb_ecc_crit, disk_bh_pro_orbs_ecc)
+    #circ_prograde_population = np.ma.masked_where(disk_bh_pro_orbs_ecc > disk_bh_pro_orb_ecc_crit, disk_bh_pro_orbs_ecc)
     # Find the e> crit_ecc population. These are the interlopers that can perturb the circularized population
-    ecc_prograde_population = np.ma.masked_where(disk_bh_pro_orbs_ecc < disk_bh_pro_orb_ecc_crit, disk_bh_pro_orbs_ecc)
+    #ecc_prograde_population = np.ma.masked_where(disk_bh_pro_orbs_ecc < disk_bh_pro_orb_ecc_crit, disk_bh_pro_orbs_ecc)
     # Find the indices of the e<crit_ecc population
-    circ_prograde_population_indices = np.ma.nonzero(circ_prograde_population)
-    ecc_prograde_population_indices = np.ma.nonzero(ecc_prograde_population)
+    #circ_prograde_population_indices = np.ma.nonzero(circ_prograde_population)
+    #ecc_prograde_population_indices = np.ma.nonzero(ecc_prograde_population)
+
+    circ_prograde_population_indices = np.asarray(disk_bh_pro_orbs_ecc <= disk_bh_pro_orb_ecc_crit).nonzero()[0]
+    ecc_prograde_population_indices = np.asarray(disk_bh_pro_orbs_ecc >= disk_bh_pro_orb_ecc_crit).nonzero()[0]
+
     # Find their locations and masses
     circ_prograde_population_locations = disk_bh_pro_orbs_a[circ_prograde_population_indices]
     circ_prograde_population_masses = disk_bh_pro_masses[circ_prograde_population_indices]
@@ -193,7 +197,7 @@ def circular_singles_encounters_prograde(
                         prob_enc_per_timestep = 1
                     random_uniform_number = rng.uniform(size=1)
                     if random_uniform_number < prob_enc_per_timestep:
-                        indx_array = circ_prograde_population_indices[0]
+                        indx_array = circ_prograde_population_indices
                         num_encounters = num_encounters + 1
                         # if close encounter, pump ecc of circ orbiter to e=0.1 from near circular, and incr a_circ1 by 10%
                         # drop ecc of a_i by 10% and drop a_i by 10% (P.E. = -GMm/a)
@@ -363,9 +367,11 @@ def circular_binaries_encounters_ecc_prograde(
     bin_orbits_per_timestep = timestep_duration_yr/bin_orbital_times
 
     # Find the e> crit_ecc population. These are the interlopers that can perturb the circularized population
-    ecc_prograde_population = np.ma.masked_where(disk_bh_pro_orbs_ecc < disk_bh_pro_orb_ecc_crit, disk_bh_pro_orbs_ecc)
+    #ecc_prograde_population = np.ma.masked_where(disk_bh_pro_orbs_ecc < disk_bh_pro_orb_ecc_crit, disk_bh_pro_orbs_ecc)
     # Find the indices of the e<crit_ecc population
-    ecc_prograde_population_indices = np.ma.nonzero(ecc_prograde_population)
+    #ecc_prograde_population_indices = np.ma.nonzero(ecc_prograde_population)
+
+    ecc_prograde_population_indices = np.asarray(disk_bh_pro_orbs_ecc >= disk_bh_pro_orb_ecc_crit).nonzero()[0]
     # Find their locations and masses
     ecc_prograde_population_locations = disk_bh_pro_orbs_a[ecc_prograde_population_indices]
     ecc_prograde_population_masses = disk_bh_pro_masses[ecc_prograde_population_indices]
@@ -606,9 +612,11 @@ def circular_binaries_encounters_circ_prograde(
     bin_binding_energy = scipy.constants.G * (solar_mass ** 2.0) * blackholes_binary.mass_1 * blackholes_binary.mass_2 / (blackholes_binary.bin_sep * rg_in_meters)
 
     # Find the e< crit_ecc population. These are the interlopers w. low encounter vel that can harden the circularized population
-    circ_prograde_population = np.ma.masked_where(disk_bh_pro_orbs_ecc > disk_bh_pro_orb_ecc_crit, disk_bh_pro_orbs_ecc)
+    #circ_prograde_population = np.ma.masked_where(disk_bh_pro_orbs_ecc > disk_bh_pro_orb_ecc_crit, disk_bh_pro_orbs_ecc)
     # Find the indices of the e<crit_ecc population
-    circ_prograde_population_indices = np.ma.nonzero(circ_prograde_population)
+    #circ_prograde_population_indices = np.ma.nonzero(circ_prograde_population)
+
+    circ_prograde_population_indices = np.asarray(disk_bh_pro_orbs_ecc <= disk_bh_pro_orb_ecc_crit).nonzero()[0]
     # Find their locations and masses
     circ_prograde_population_locations = disk_bh_pro_orbs_a[circ_prograde_population_indices]
     circ_prograde_population_masses = disk_bh_pro_masses[circ_prograde_population_indices]
