@@ -1220,7 +1220,6 @@ def main():
                     agn_redshift
                 )
 
-
             if blackholes_inner_disk.num > 0:
                 blackholes_emris.add_blackholes(new_mass=blackholes_inner_disk.mass,
                                                 new_spin=blackholes_inner_disk.spin,
