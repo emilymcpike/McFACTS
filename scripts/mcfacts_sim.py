@@ -581,6 +581,7 @@ def main():
                 blackholes_retro.orb_ecc,
                 blackholes_retro.orb_inc,
                 blackholes_retro.orb_arg_periapse,
+                opts.disk_inner_stable_circ_orb,
                 disk_surface_density,
                 opts.timestep_duration_yr
             )
