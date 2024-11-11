@@ -59,11 +59,13 @@ def type1_migration_old(smbh_mass, disk_bh_orb_a_pro, disk_bh_mass_pro, disk_sur
     # Migration can only occur for sufficiently damped orbital ecc. If orb ecc <= e_crit, then migration.
     # Otherwise, no change in semi-major axis. Wait till orb ecc damped to <=e_crit.
     # Only show BH with orb ecc <=e_crit
-    disk_bh_orb_ecc_pro = np.ma.masked_where(disk_bh_orb_ecc_pro > disk_bh_pro_orb_ecc_crit, disk_bh_orb_ecc_pro)
+    #BUG below line is original
+    #disk_bh_orb_ecc_pro = np.ma.masked_where(disk_bh_orb_ecc_pro > disk_bh_pro_orb_ecc_crit, disk_bh_orb_ecc_pro)
+    disk_bh_mig = np.ma.masked_where(disk_bh_orb_ecc_pro > disk_bh_pro_orb_ecc_crit, disk_bh_orb_ecc_pro)
     # Those BH with orb ecc > e_crit
     disk_bh_not_mig = np.ma.masked_where(disk_bh_orb_ecc_pro <= disk_bh_pro_orb_ecc_crit, disk_bh_orb_ecc_pro)
     # Indices of BH with <=critical ecc
-    disk_bh_crit_ecc_pro_indices = np.ma.nonzero(disk_bh_orb_ecc_pro)
+    disk_bh_crit_ecc_pro_indices = np.ma.nonzero(disk_bh_mig)
     # Indicies of BH with > critical ecc
     disk_bh_crit_ecc_not_mig = np.ma.nonzero(disk_bh_not_mig)
 
@@ -167,7 +169,6 @@ def type1_migration_old(smbh_mass, disk_bh_orb_a_pro, disk_bh_mass_pro, disk_sur
         # Toss the binaries
         disk_bh_pro_a_new[empty_mask] = 0.
         raise RuntimeError("disk_bh_pro_a_new was not set properly; a case was missed")
-
     return disk_bh_pro_a_new
 
 
@@ -219,7 +220,6 @@ def type1_migration(smbh_mass, orbs_a, masses, orbs_ecc, orb_ecc_crit,
     # Otherwise no change in semi-major axis (orb_a).
     # Get indices of objects with orb_ecc <= ecc_crit so we can only update orb_a for those.
     migration_indices = np.asarray(orbs_ecc <= orb_ecc_crit).nonzero()[0]
-
     # If nothing will migrate then end the function
     if migration_indices.shape == (0,):
         # BUG it shouldn't work like this
@@ -300,7 +300,6 @@ def type1_migration(smbh_mass, orbs_a, masses, orbs_ecc, orb_ecc_crit,
     # Update orbs_a
     orbs_a[migration_indices] = new_orbs_a
     orbs_a[orbs_a > disk_radius_outer] = disk_radius_outer  # BUG should not work like this
-
     return (orbs_a)
 
 
