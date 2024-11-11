@@ -16,7 +16,7 @@ McFACTS is the first public, open source, population synthesis code modeling the
 
 You can find more information about McFACTS as well as contact and office hour information at our [website](https://saavikford.wixsite.com/saavik/general-7). It's a work in progress, so please be patient!
 
-Opt-in to everything McFACTS: click [here](https://docs.google.com/forms/d/109iAl9Mey8VZY8NWOjkIsubzNdP7UlYSyr38LQWrSq4/prefill) to join our mailing list.
+Opt-in to everything McFACTS: click [here](https://docs.google.com/forms/d/e/1FAIpQLSeupzj8ledPslYc0bHbnJHKB7_LKlr8SY3SfbEVyL5AfeFlVg/viewform) to join our mailing list.
 
 You can find documentation for our code and modules at our [Read the Docs](https://mcfacts.readthedocs.io).
 
