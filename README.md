@@ -132,6 +132,11 @@ McFACTS will also generate the following plots:
 
 Paper 1: (https://arxiv.org/abs/2410.16515)
 
+Paper 2: *In Preparation*
+
+Paper 3: (https://arxiv.org/abs/2410.18815)
+
 McFACTS is developed by Barry McKernan, K. E. Saavik Ford, Harrison E. Cook, Vera Delfavero, Emily McPike, Kaila Nathaniel, Jake Postiglione, Shawn Ray, and Richard O'Shaughnessy. If you use McFACTS in your work, please cite the following:
 
 * McKernan, B., Ford, K.E.S., Cook, H.E., et al., *McFACTS I: Testing the LVK AGN channel with Monte Carlo for AGN Channel Testing and Simulation (McFACTS)*. 2024. ([arXiv](https://arxiv.org/abs/2410.16515))
+* Delfavero, V., et al., *McFacts III: Compact binary mergers from AGN disks over an entire synthetic universe*. 2024. ([arXiv](https://arxiv.org/abs/2410.18815))
