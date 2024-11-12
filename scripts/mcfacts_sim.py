@@ -711,7 +711,7 @@ def main():
 
                 # If there are binaries, evolve them
                 # Damp binary orbital eccentricity
-                eccentricity.orbital_bin_ecc_damping(
+                blackholes_binary = eccentricity.orbital_bin_ecc_damping(
                     opts.smbh_mass,
                     blackholes_binary,
                     disk_surface_density,
