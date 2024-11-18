@@ -2,7 +2,7 @@
 import numpy as np
 import pytest
 
-from mcfacts.physics.binary.merge import tgw
+from mcfacts.physics.binary.merge import normalize_tgw
 import conftest as provider
 from conftest import InputParameterSet
 
@@ -20,4 +20,4 @@ def param_normalize_tgw():
 def test_normalize_tgw(smbh_mass, expected):
     """test function"""
 
-    assert np.abs(tgw.normalize_tgw(smbh_mass) - expected) < 1.e4
+    assert np.abs(normalize_tgw(smbh_mass, 50) - expected) < 1.e4
