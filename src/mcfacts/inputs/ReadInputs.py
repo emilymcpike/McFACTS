@@ -6,6 +6,8 @@ Inifile
         'sirko_goodman' or 'thompson_etal'
     "flag_use_pagn"                 : bool
         Use pAGN to generate disk model?
+    "flag_add_stars"                : bool
+        Add stars to the disk
     "smbh_mass"                     : float
         Mass of the supermassive black hole (solMass)
     "disk_radius_trap"              : float
@@ -95,9 +97,6 @@ Inifile
         How many timesteps are you taking (timestep*number_of_timesteps = disk_lifetime)
     "galaxy_num"                    : int
         Number of galaxies of code run (e.g. 1 for testing, 30 for a quick run)
-    "fraction_retro"                : float
-        Fraction of BBH that form retrograde to test (q,X_eff) relation.
-        Default retro=0.1. Possibly overwritten by initial retro population
     "fraction_bin_retro"            : float
         Fraction of BBH that form retrograde to test (q,X_eff) relation. Default retro=0.1
     "flag_thermal_feedback"         : int
@@ -117,8 +116,6 @@ Inifile
     "delta_energy_strong"           : float
         Average energy change per strong interaction.
         de can be 20% in cluster interactions. May be 10% on average (with gas)
-    "agn_redshift"                  : float
-        Redshift of AGN activity
     "inner_disk_outer_radius"       : float
         Outer radius of the inner disk (Rg)
     "disk_inner_stable_circ_orb"    : float
@@ -144,6 +141,7 @@ from astropy import constants as ct
 INPUT_TYPES = {
     "disk_model_name"               : str,
     "flag_use_pagn"                 : bool,
+    "flag_add_stars"                : bool,
     "smbh_mass"                     : float,
     "disk_radius_trap"              : float,
     "disk_radius_outer"             : float,
@@ -181,7 +179,6 @@ INPUT_TYPES = {
     "timestep_duration_yr"          : float,
     "timestep_num"                  : int,
     "galaxy_num"                    : int,
-    "fraction_retro"                : float,
     "fraction_bin_retro"            : float,
     "flag_thermal_feedback"         : int,
     "flag_orb_ecc_damping"          : int,
@@ -190,10 +187,10 @@ INPUT_TYPES = {
     "disk_bh_pro_orb_ecc_crit"      : float,
     "flag_dynamic_enc"              : int,
     "delta_energy_strong"           : float,
-    "agn_redshift"                  : float,
     "inner_disk_outer_radius"       : float,
     "disk_inner_stable_circ_orb"    : float,
     "mass_pile_up"                  : float,
+    "save_snapshots"                : bool,
 }
 
 
@@ -257,6 +254,30 @@ def ReadInputs_ini(fname_ini, verbose=False):
     if not ('flag_use_pagn' in input_variables):
         input_variables['flag_use_pagn'] = False
 
+    ## Check outer disk radius in parsecs
+    # Scale factor for parsec distance in r_g
+    pc_dist = 2.e5*((input_variables["smbh_mass"]/1.e8)**(-1.0))
+    # Calculate outer disk radius in pc
+    disk_radius_outer_pc = input_variables["disk_radius_outer"]/pc_dist
+    # Check disk_radius_max_pc argument
+    if input_variables["disk_radius_max_pc"] == 0.:
+        # Case 1: disk_radius_max_pc is disabled
+        pass
+    elif input_variables["disk_radius_max_pc"] < 0.:
+        # Case 2: disk_radius_max_pc is negative
+        # Always assign disk_radius_outer to given distance in parsecs
+        input_variables["disk_radius_outer"] = \
+            -1. * input_variables["disk_radius_max_pc"] * pc_dist
+    else:
+        # Case 3: disk_radius_max_pc is positive
+        # Cap disk_radius_outer at given value
+        if disk_radius_outer_pc > input_variables["disk_radius_max_pc"]:
+            # calculate scale factor
+            disk_radius_scale = input_variables["disk_radius_max_pc"] / disk_radius_outer_pc
+            # Adjust disk_radius_outer as needed
+            input_variables["disk_radius_outer"] = \
+                input_variables["disk_radius_outer"] * disk_radius_scale
+
     # Print out the dictionary if we are in verbose mode
     if verbose:
         print("input_variables:")
@@ -270,6 +291,7 @@ def ReadInputs_ini(fname_ini, verbose=False):
 def load_disk_arrays(
     disk_model_name,
     disk_radius_outer,
+    verbose=False
     ):
     """Load the dictionary arrays from file (pAGN_off)
 
@@ -281,6 +303,8 @@ def load_disk_arrays(
         sirko_goodman or thompson_etal
     disk_radius_outer : float
         Outer disk radius we truncate at
+    verbose : bool
+        Print extra things
 
     Returns
     -------
@@ -298,9 +322,14 @@ def load_disk_arrays(
     fname_disk_density = impresources.files(mcfacts_input_data) / fname_disk_density
     # Load data from the surface density file
     disk_density_data = np.loadtxt(fname_disk_density)
+
+    # Get the radii from the data (second column)
     disk_model_radii = disk_density_data[:,1]
-    print(disk_model_radii)
-    print(disk_radius_outer)
+    if verbose:
+        print("disk_radius_outer", disk_radius_outer)
+        print("disk_model_radii", disk_model_radii)
+    
+    # Get the surface densities from the data (first column)
     disk_surface_densities = disk_density_data[:,0]
     # truncate disk at outer radius
     truncated_disk_radii = np.extract(
@@ -320,16 +349,28 @@ def load_disk_arrays(
     fname_disk_aspect_ratio = impresources.files(mcfacts_input_data) / fname_disk_aspect_ratio
     # Load data from the aspect ratio file
     disk_aspect_ratio_data = np.loadtxt(fname_disk_aspect_ratio)
-    aspect_ratios = disk_aspect_ratio_data[:,0]
+    disk_aspect_ratios = disk_aspect_ratio_data[:,0]
     # Truncate the aspect ratio array
-    truncated_aspect_ratios = aspect_ratios[0:len(truncated_disk_radii)]
+    truncated_aspect_ratios = disk_aspect_ratios[0:len(truncated_disk_radii)]
+
+    # Get opacity filename
+    fname_disk_opacity = disk_model_name + '_opacity.txt'
+    # Look in the source data
+    fname_disk_opacity = impresources.files(mcfacts_input_data) / fname_disk_opacity
+    # Load data from opacity file
+    disk_opacity_data = np.loadtxt(fname_disk_opacity)
+    # Get the opacities from the data (first column)
+    disk_opacities = disk_opacity_data[:,0]
+    # Truncate disk at outer radius
+    truncated_opacities = disk_opacities[0:len(truncated_disk_radii)]
 
     # Now redefine arrays used to generate interpolating functions in terms of truncated arrays
-    return truncated_disk_radii, truncated_surface_densities, truncated_aspect_ratios
+    return truncated_disk_radii, truncated_surface_densities, truncated_aspect_ratios, truncated_opacities
 
 def construct_disk_direct(
     disk_model_name,
     disk_radius_outer,
+    verbose=False
     ):
     """Construct a disk interpolation without pAGN
 
@@ -342,6 +383,8 @@ def construct_disk_direct(
         sirko_goodman or thompson_etal
     disk_radius_outer : float
         Outer disk radius we truncate at
+    verbose : bool
+        Print extra things
 
     Returns
     -------
@@ -349,31 +392,42 @@ def construct_disk_direct(
         Surface density (radius)
     disk_aspect_ratio_func : lambda
         Aspect ratio (radius)
+    disk_opacity_func : lambda
+        Opacity (radius)
     disk_model_properties : dict
         Other disk model things we may want
     """
     # Call the load_disk_arrays function
-    disk_model_radii, surface_densities, aspect_ratios = \
+    disk_model_radii, surface_densities, aspect_ratios, opacities = \
         load_disk_arrays(
         disk_model_name,
         disk_radius_outer,
+        verbose=verbose
         )
     print(disk_model_radii)
-    # Now geenerate interpolating functions
-    # create surface density & aspect ratio functions from input arrays
+    # Now generate interpolating functions
+    # Create surface density function from input arrays
     disk_surf_dens_func_log = scipy.interpolate.CubicSpline(
         np.log(disk_model_radii), np.log(surface_densities))
     disk_surf_dens_func = lambda x, f=disk_surf_dens_func_log: np.exp(f(np.log(x)))
 
+    # Create aspect ratio function from input arrays
     disk_aspect_ratio_func_log = scipy.interpolate.CubicSpline(
-            np.log(disk_model_radii), np.log(aspect_ratios))
+        np.log(disk_model_radii), np.log(aspect_ratios))
     disk_aspect_ratio_func = lambda x, f=disk_aspect_ratio_func_log: np.exp(f(np.log(x)))
+
+    # Create opacity function from input arrays
+    disk_opacity_func_log = scipy.interpolate.CubicSpline(
+        np.log(disk_model_radii), np.log(opacities))
+    disk_opacity_func = lambda x, f=disk_opacity_func_log: np.exp(f(np.log(x)))
 
     # Define properties we want to return
     disk_model_properties ={}
     disk_model_properties['Sigma'] = disk_surf_dens_func
     disk_model_properties['h_over_r'] = disk_aspect_ratio_func
-    return disk_surf_dens_func, disk_aspect_ratio_func, disk_model_properties
+    disk_model_properties['kappa'] = disk_opacity_func
+
+    return disk_surf_dens_func, disk_aspect_ratio_func, disk_opacity_func, disk_model_properties
 
 def construct_disk_pAGN(
     disk_model_name,
@@ -383,7 +437,19 @@ def construct_disk_pAGN(
     disk_bh_eddington_ratio,
     rad_efficiency=0.1,
     ):
-    """
+    """Construct AGN disk model using the pAGN code.
+
+    Get 1d functions of radius for your choice of disk model. Disk model can be
+    Sirko & Goodman (2003) or Thompson, Quataert, & Murray (2005)
+
+    Sirko and Goodman. “Spectral Energy Distributions of Marginally
+    Self-Gravitating Quasi-Stellar Object Discs.” 2003MNRAS.341..501S.
+    [DOI](https://doi.org/10.1046/j.1365-8711.2003.06431.x).
+
+    Thompson, Quataert, & Murray. “Radiation Pressure-Supported
+    Starburst Disks and Active Galactic Nucleus Fueling.” 2005ApJ.630..167.
+    [DOI](https://doi.org/10.1086/431923).
+
     Parameters
     ----------
     disk_model_name : str
@@ -403,6 +469,8 @@ def construct_disk_pAGN(
         Surface density (radius)
     disk_aspect_ratio_func : lambda
         Aspect ratio (radius)
+    disk_opacity_func : lambda
+        Opacity (radius)
     disk_model_properties : dict
         Other disk model things we may want
     bonus_structures : dict
@@ -430,20 +498,21 @@ def construct_disk_pAGN(
         base_args['Rout'] = disk_radius_outer * Rg.to('m').value
     else:
         raise RuntimeError("unknown disk model: %s"%(disk_model_name))
-        
+
     # note Rin default is 3 Rs
 
     # Run pAGN
     pagn_model =dm_pagn.AGNGasDiskModel(disk_type=pagn_name,**base_args)
-    disk_surf_dens_func, disk_aspect_ratio_func, bonus_structures  = \
+    disk_surf_dens_func, disk_aspect_ratio_func, disk_opacity_func, bonus_structures = \
         pagn_model.return_disk_surf_model()
 
     # Define properties we want to return
     disk_model_properties ={}
     disk_model_properties['Sigma'] = disk_surf_dens_func
     disk_model_properties['h_over_r'] = disk_aspect_ratio_func
+    disk_model_properties['kappa'] = disk_opacity_func
 
-    return  disk_surf_dens_func, disk_aspect_ratio_func, disk_model_properties, bonus_structures
+    return disk_surf_dens_func, disk_aspect_ratio_func, disk_opacity_func, disk_model_properties, bonus_structures
 
 
 def construct_disk_interp(
@@ -479,32 +548,12 @@ def construct_disk_interp(
         Surface density (radius)
     disk_aspect_ratio_func : lambda
         Aspect ratio (radius)
+    disk_opacity_func : lambda
+        Opacity (radius)
     """
     ## Check inputs ##
     # Check smbh_mass
     assert type(smbh_mass) == float, "smbh_mass expected float, got %s"%(type(smbh_mass))
-
-    ## Check outer disk radius in parsecs
-    # Scale factor for parsec distance in r_g
-    pc_dist = 2.e5*((smbh_mass/1.e8)**(-1.0))
-    # Calculate outer disk radius in pc
-    disk_radius_outer_pc = disk_radius_outer/pc_dist
-    # Check disk_radius_max_pc argument
-    if disk_radius_max_pc == 0.:
-        # Case 1: disk_radius_max_pc is disabled
-        pass
-    elif disk_radius_max_pc < 0.:
-        # Case 2: disk_radius_max_pc is negative
-        # Always assign disk_radius_outer to given distance in parsecs
-        disk_radius_outer = -1. * disk_radius_max_pc * pc_dist
-    else:
-        # Case 3: disk_radius_max_pc is positive
-        # Cap disk_radius_outer at given value
-        if disk_radius_outer_pc > disk_radius_max_pc:
-            # calculate scale factor
-            disk_radius_scale = disk_radius_max_pc / disk_radius_outer_pc
-            # Adjust disk_radius_outer as needed
-            disk_radius_outer = disk_radius_outer * disk_radius_scale
 
     # open the disk model surface density file and read it in
     # Note format is assumed to be comments with #
@@ -513,15 +562,16 @@ def construct_disk_interp(
     #   infile = model_surface_density.txt, where model is user choice
     if not(flag_use_pagn):
         # Load interpolators
-        disk_surf_dens_func, disk_aspect_ratio_func, disk_model_properties = \
+        disk_surf_dens_func, disk_aspect_ratio_func, disk_opacity_func, disk_model_properties = \
             construct_disk_direct(
                 disk_model_name,
                 disk_radius_outer,
+                verbose=verbose
             )
 
     else:
         # instead, populate with pagn
-        disk_surf_dens_func, disk_aspect_ratio_func, disk_model_properties, bonus_structures = \
+        disk_surf_dens_func, disk_aspect_ratio_func, disk_opacity_func, disk_model_properties, bonus_structures = \
             construct_disk_pAGN(
                 disk_model_name,
                 smbh_mass,
@@ -535,7 +585,7 @@ def construct_disk_interp(
         print("I read and digested your disk model")
         print("Sending variables back")
 
-    return disk_surf_dens_func, disk_aspect_ratio_func
+    return disk_surf_dens_func, disk_aspect_ratio_func, disk_opacity_func
 
 def ReadInputs_prior_mergers(fname='recipes/sg1Myrx2_survivors.dat', verbose=False):
     """This function reads your prior mergers from a file user specifies or
@@ -572,8 +622,8 @@ def ReadInputs_prior_mergers(fname='recipes/sg1Myrx2_survivors.dat', verbose=Fal
         (wasn't involved in merger in previous episode; but accretion=mass/spin changed)
     )
     """
-    with open('../recipes/sg1Myrx2_survivors.dat') as filedata:
-        prior_mergers_file = np.genfromtxt('../recipes/sg1Myrx2_survivors.dat', unpack = True)
+    with open(fname, 'r') as filedata:
+        prior_mergers_file = np.genfromtxt(filedata, unpack = True)
 
 
     #Clean the file of galaxy lines (of form 3.0 3.0 3.0 3.0 3.0 etc for it=3.0, same value across each column)
