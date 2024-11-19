@@ -583,7 +583,8 @@ def main():
                 blackholes_retro.orb_arg_periapse,
                 opts.disk_inner_stable_circ_orb,
                 disk_surface_density,
-                opts.timestep_duration_yr
+                opts.timestep_duration_yr,
+                opts.disk_radius_outer
             )
             # Check for bin_ecc unphysical
             bh_retro_id_num_unphysical_ecc = blackholes_retro.id_num[blackholes_retro.orb_ecc >= 1.]
@@ -676,6 +677,7 @@ def main():
                     opts.timestep_duration_yr,
                     opts.disk_bh_pro_orb_ecc_crit,
                     opts.delta_energy_strong,
+                    opts.disk_radius_outer
                 )
 
                 stars_pro.orb_a, stars_pro.orb_ecc = dynamics.circular_singles_encounters_prograde(
@@ -686,6 +688,7 @@ def main():
                     opts.timestep_duration_yr,
                     opts.disk_bh_pro_orb_ecc_crit,
                     opts.delta_energy_strong,
+                    opts.disk_radius_outer
                 )
 
             # Do things to the binaries--first check if there are any:
@@ -698,16 +701,16 @@ def main():
                 bh_binary_id_num_unphysical = evolve.bin_reality_check(blackholes_binary=blackholes_binary)
                 if bh_binary_id_num_unphysical.size > 0:
 
-                    # One of the key parameter (mass or location is zero). Not real. Delete binary. Remove column at index = ionization_flag
+                    # One of the key parameter (mass or location is zero or bin_ecc > 1). Not real. Delete binary. Remove column at index = ionization_flag
                     blackholes_binary.remove_id_num(bh_binary_id_num_unphysical)
                     filing_cabinet.remove_id_num(bh_binary_id_num_unphysical)
 
                 # Check for bin_ecc unphysical
-                bh_binary_id_num_unphysical_ecc = blackholes_binary.id_num[blackholes_binary.bin_ecc >= 1.]
-                if bh_binary_id_num_unphysical_ecc.size > 0:
-                    # The binary has unphysical eccentricity. Delete
-                    blackholes_binary.remove_id_num(bh_binary_id_num_unphysical_ecc)
-                    filing_cabinet.remove_id_num(bh_binary_id_num_unphysical_ecc)
+                # bh_binary_id_num_unphysical_ecc = blackholes_binary.id_num[blackholes_binary.bin_ecc >= 1.]
+                # if bh_binary_id_num_unphysical_ecc.size > 0:
+                #     # The binary has unphysical eccentricity. Delete
+                #     blackholes_binary.remove_id_num(bh_binary_id_num_unphysical_ecc)
+                #     filing_cabinet.remove_id_num(bh_binary_id_num_unphysical_ecc)
 
                 # If there are binaries, evolve them
                 # Damp binary orbital eccentricity
@@ -733,7 +736,13 @@ def main():
                         opts.disk_bh_pro_orb_ecc_crit,
                         opts.delta_energy_strong,
                         blackholes_binary,
+                        opts.disk_radius_outer
                     )
+
+                    # Update filing cabinet with new bin_sep
+                    filing_cabinet.update(id_num=blackholes_binary.id_num,
+                                          attr="size",
+                                          new_info=blackholes_binary.bin_sep)
 
                     # Soften/ ionize binaries due to encounters with eccentric singletons
                     # Return 3 things: perturbed biary_bh_array, disk_bh_pro_orbs_a, disk_bh_pro_orbs_ecc
@@ -746,7 +755,13 @@ def main():
                         opts.disk_bh_pro_orb_ecc_crit,
                         opts.delta_energy_strong,
                         blackholes_binary,
+                        opts.disk_radius_outer
                     )
+                   
+                    # Update filing cabinet with new bin_sep
+                    filing_cabinet.update(id_num=blackholes_binary.id_num,
+                                          attr="size",
+                                          new_info=blackholes_binary.bin_sep)
 
                 # Check for bin_ecc unphysical
                 # We need a second check here
@@ -766,8 +781,18 @@ def main():
                     time_passed,
                 )
 
+                # Update filing cabinet with new bin_sep
+                filing_cabinet.update(id_num=blackholes_binary.id_num,
+                                      attr="size",
+                                      new_info=blackholes_binary.bin_sep)
+
                 # Check closeness of binary. Are black holes at merger condition separation
                 blackholes_binary = evolve.bin_contact_check(blackholes_binary, opts.smbh_mass)
+
+                # Update filing cabinet with new bin_sep
+                filing_cabinet.update(id_num=blackholes_binary.id_num,
+                                      attr="size",
+                                      new_info=blackholes_binary.bin_sep)
 
                 # Accrete gas onto binary components
                 blackholes_binary = evolve.change_bin_mass(
@@ -806,6 +831,10 @@ def main():
                         opts.delta_energy_strong,
                         opts.nsc_spheroid_normalization,
                     )
+                    # Update filing cabinet with new bin_sep
+                    filing_cabinet.update(id_num=blackholes_binary.id_num,
+                                          attr="size",
+                                          new_info=blackholes_binary.bin_sep)
 
                 if (opts.flag_dynamic_enc > 0):
                     # Recapture bins out of disk plane. 
@@ -916,7 +945,7 @@ def main():
                         new_gen=np.concatenate([
                             blackholes_binary.at_id_num(bh_binary_id_num_ionization, "gen_1"),
                             blackholes_binary.at_id_num(bh_binary_id_num_ionization, "gen_2")]),
-                        new_orb_ecc=np.full(bh_binary_id_num_ionization.size * 2, 0.01),
+                        new_orb_ecc=setupdiskblackholes.setup_disk_blackholes_eccentricity_thermal(bh_binary_id_num_ionization.size * 2), #np.full(bh_binary_id_num_ionization.size * 2, 0.01), # BUG
                         new_orb_inc=np.full(bh_binary_id_num_ionization.size * 2, 0.0),
                         new_orb_ang_mom=np.ones(bh_binary_id_num_ionization.size * 2),
                         new_orb_arg_periapse=np.full(bh_binary_id_num_ionization.size * 2, -1.5),
@@ -1031,7 +1060,7 @@ def main():
                                                       new_spin_angle=np.zeros(bh_binary_id_num_merger.size),
                                                       new_orb_inc=np.zeros(bh_binary_id_num_merger.size),
                                                       new_orb_ang_mom=np.ones(bh_binary_id_num_merger.size),
-                                                      new_orb_ecc=np.full(bh_binary_id_num_merger.size, 0.01),
+                                                      new_orb_ecc=setupdiskblackholes.setup_disk_blackholes_eccentricity_thermal(bh_binary_id_num_merger.size),#np.full(bh_binary_id_num_merger.size, 0.01),
                                                       new_gen=np.maximum(blackholes_merged.at_id_num(bh_binary_id_num_merger, "gen_1"),
                                                                          blackholes_merged.at_id_num(bh_binary_id_num_merger, "gen_2")) + 1.0,
                                                       new_orb_arg_periapse=np.full(bh_binary_id_num_merger.size, -1.5),
