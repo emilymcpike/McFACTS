@@ -99,8 +99,8 @@ def change_bin_spin_magnitudes(blackholes_binary, disk_bh_eddington_ratio,
     spin_1_after = spin_1_before + spin_change_factor
     spin_2_after = spin_2_before + spin_change_factor
 
-    spin_1_after[spin_1_after > max_allowed_spin] = np.full(np.sum(spin_1_after > max_allowed_spin), max_allowed_spin)
-    spin_2_after[spin_2_after > max_allowed_spin] = np.full(np.sum(spin_2_after > max_allowed_spin), max_allowed_spin)
+    spin_1_after[spin_1_after > max_allowed_spin] = max_allowed_spin
+    spin_2_after[spin_2_after > max_allowed_spin] = max_allowed_spin
 
     blackholes_binary.spin_1[idx_non_mergers] = spin_1_after
     blackholes_binary.spin_2[idx_non_mergers] = spin_2_after
@@ -320,7 +320,7 @@ def bin_contact_check(blackholes_binary, smbh_mass):
 
     # If binary separation <= contact condition, set binary separation to contact condition
     blackholes_binary.bin_sep[mask_condition] = contact_condition[mask_condition]
-    blackholes_binary.flag_merging[mask_condition] = np.full(np.sum(mask_condition), -2)
+    blackholes_binary.flag_merging[mask_condition] = -2
 
     return (blackholes_binary)
 
@@ -391,7 +391,6 @@ def bin_harden_baruteau(blackholes_binary, smbh_mass, timestep_duration_yr,
     # 2. Find number of binary orbits around its center of mass within the timestep
     # 3. For every 10^3 orbits, halve the binary separation.
 
-
     # Only interested in BH that have not merged
     idx_non_mergers = np.where(blackholes_binary.flag_merging >= 0)[0]
 
@@ -438,8 +437,8 @@ def bin_harden_baruteau(blackholes_binary, smbh_mass, timestep_duration_yr,
 
     # Otherwise binary will merge in this timestep
     # Update flag_merging to -2 and time_merged to current time
-    blackholes_binary.flag_merging[idx_non_mergers[time_to_merger_gw <= timestep_duration_yr]] = np.full(np.sum(time_to_merger_gw <= timestep_duration_yr), -2)
-    blackholes_binary.time_merged[idx_non_mergers[time_to_merger_gw <= timestep_duration_yr]] = np.full(np.sum(time_to_merger_gw <= timestep_duration_yr), time_passed)
+    blackholes_binary.flag_merging[idx_non_mergers[time_to_merger_gw <= timestep_duration_yr]] = -2
+    blackholes_binary.time_merged[idx_non_mergers[time_to_merger_gw <= timestep_duration_yr]] = time_passed
     # Finite check
     assert np.isfinite(blackholes_binary.flag_merging).all(),\
         "Finite check failure: blackholes_binary.flag_merging"
