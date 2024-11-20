@@ -277,8 +277,7 @@ def merged_orb_ecc(bin_orbs_a, v_kicks, smbh_mass):
         Orbital eccentricity of merged binary with :obj:`float` type
     """
     smbh_mass_units = smbh_mass * u.solMass
-    rg_in_meters = (const.G * (smbh_mass_units) / (const.c ** 2.0)).to("meter")
-    orbs_a_units = bin_orbs_a * rg_in_meters
+    orbs_a_units = si_from_r_g(smbh_mass * u.solMass, bin_orbs_a).to("meter")
 
     v_kep = ((np.sqrt(const.G * smbh_mass_units / orbs_a_units)).to("km/s")).value
 

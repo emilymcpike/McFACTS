@@ -928,7 +928,7 @@ def main():
                 if bh_binary_id_num_ionization.size > 0:
                     # Append 2 new BH to arrays of single BH locations, masses, spins, spin angles & gens
                     # For now add 2 new orb ecc term of 0.01. inclination is 0.0 as well. TO DO: calculate v_kick and resulting perturbation to orb ecc.
-
+                    new_orb_ecc = eccentricity.ionized_orb_ecc(bh_binary_id_num_ionization.size * 2, opts.disk_bh_orb_ecc_max_init)
                     blackholes_pro.add_blackholes(
                         new_mass=np.concatenate([
                             blackholes_binary.at_id_num(bh_binary_id_num_ionization, "mass_1"),
@@ -945,7 +945,8 @@ def main():
                         new_gen=np.concatenate([
                             blackholes_binary.at_id_num(bh_binary_id_num_ionization, "gen_1"),
                             blackholes_binary.at_id_num(bh_binary_id_num_ionization, "gen_2")]),
-                        new_orb_ecc=eccentricity.ionized_orb_ecc(bh_binary_id_num_ionization.size * 2, opts.disk_bh_orb_ecc_max_init),
+                        new_orb_ecc=np.full(bh_binary_id_num_ionization.size * 2, 0.01),
+                        #new_orb_ecc=new_orb_ecc,
                         new_orb_inc=np.full(bh_binary_id_num_ionization.size * 2, 0.0),
                         new_orb_ang_mom=np.ones(bh_binary_id_num_ionization.size * 2),
                         new_orb_arg_periapse=np.full(bh_binary_id_num_ionization.size * 2, -1.5),
@@ -1067,7 +1068,8 @@ def main():
                                                       new_spin_angle=np.zeros(bh_binary_id_num_merger.size),
                                                       new_orb_inc=np.zeros(bh_binary_id_num_merger.size),
                                                       new_orb_ang_mom=np.ones(bh_binary_id_num_merger.size),
-                                                      new_orb_ecc=bh_orb_ecc_merged,
+                                                      new_orb_ecc=np.full(bh_binary_id_num_merger.size, 0.01),
+                                                      #new_orb_ecc=bh_orb_ecc_merged,
                                                       new_gen=np.maximum(blackholes_merged.at_id_num(bh_binary_id_num_merger, "gen_1"),
                                                                          blackholes_merged.at_id_num(bh_binary_id_num_merger, "gen_2")) + 1.0,
                                                       new_orb_arg_periapse=np.full(bh_binary_id_num_merger.size, -1.5),
