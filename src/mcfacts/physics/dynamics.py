@@ -347,14 +347,13 @@ def circular_binaries_encounters_ecc_prograde(
 
     # Set up constants
     solar_mass = astropy_units.solMass.to("kg")
-    rg_in_meters = scipy.constants.G * (solar_mass*smbh_mass) / (scipy.constants.c ** 2.0)
     # eccentricity correction--do not let ecc>=1, catch and reset to 1-epsilon
     epsilon = 1e-8
 
     # Set up other values we need
     bin_masses = blackholes_binary.mass_1 + blackholes_binary.mass_2
     bin_velocities = scipy.constants.c / np.sqrt(blackholes_binary.bin_orb_a)
-    bin_binding_energy = scipy.constants.G * (solar_mass ** 2) * blackholes_binary.mass_1 * blackholes_binary.mass_2 / (blackholes_binary.bin_sep * rg_in_meters)
+    bin_binding_energy = scipy.constants.G * (solar_mass ** 2) * blackholes_binary.mass_1 * blackholes_binary.mass_2 / (si_from_r_g(smbh_mass, blackholes_binary.bin_sep).to("meter")).value
     bin_orbital_times = 3.15 * (smbh_mass / 1.e8) * ((blackholes_binary.bin_orb_a / 1.e3) ** 1.5)
     bin_orbits_per_timestep = timestep_duration_yr/bin_orbital_times
 
@@ -592,7 +591,6 @@ def circular_binaries_encounters_circ_prograde(
 
     # Housekeeping
     solar_mass = astropy_units.solMass.to("kg")
-    rg_in_meters = scipy.constants.G * (solar_mass * smbh_mass) / (scipy.constants.c ** 2.0)
 
     # Magnitude of energy change to drive binary to merger in ~2 interactions in a strong encounter. Say de_strong=0.9
     # de_strong here refers to the perturbation of the binary around its center of mass
@@ -607,7 +605,7 @@ def circular_binaries_encounters_circ_prograde(
     bin_velocities = scipy.constants.c/np.sqrt(blackholes_binary.bin_orb_a)
     bin_orbital_times = 3.15 * (smbh_mass / 1.e8) * ((blackholes_binary.bin_orb_a / 1.e3) ** 1.5)
     bin_orbits_per_timestep = timestep_duration_yr / bin_orbital_times
-    bin_binding_energy = scipy.constants.G * (solar_mass ** 2.0) * blackholes_binary.mass_1 * blackholes_binary.mass_2 / (blackholes_binary.bin_sep * rg_in_meters)
+    bin_binding_energy = scipy.constants.G * (solar_mass ** 2.0) * blackholes_binary.mass_1 * blackholes_binary.mass_2 /  (si_from_r_g(smbh_mass, blackholes_binary.bin_sep).to("meter")).value
 
     # Find the e< crit_ecc population. These are the interlopers w. low encounter vel that can harden the circularized population
     circ_prograde_population_indices = np.asarray(disk_bh_pro_orbs_ecc <= disk_bh_pro_orb_ecc_crit).nonzero()[0]
@@ -852,12 +850,11 @@ def bin_spheroid_encounter(
     # eccentricity correction--do not let ecc>=1, catch and reset to 1-epsilon
     epsilon = 1e-8
     # Spheroid normalization to allow for non-ideal NSC (cored/previous AGN episodes/disky population concentration/whatever)
-    rg_in_meters = scipy.constants.G * (solar_mass * smbh_mass) / (scipy.constants.c ** 2.0)
 
     # Set up binary properties we need for later
     bin_mass = blackholes_binary.mass_1 + blackholes_binary.mass_2
     bin_velocities = scipy.constants.c / np.sqrt(blackholes_binary.bin_orb_a)
-    bin_binding_energy = scipy.constants.G * (solar_mass ** 2) * blackholes_binary.mass_1 * blackholes_binary.mass_2 / (blackholes_binary.bin_sep * rg_in_meters)
+    bin_binding_energy = scipy.constants.G * (solar_mass ** 2) * blackholes_binary.mass_1 * blackholes_binary.mass_2 / (si_from_r_g(smbh_mass, blackholes_binary.bin_sep).to("meter")).value
 
     # Calculate encounter rate for each binary based on bin_orb_a, binary size, and time_passed
     # Set up array of encounter rates filled with -1
