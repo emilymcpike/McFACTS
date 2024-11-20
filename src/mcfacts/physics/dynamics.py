@@ -66,7 +66,7 @@ def circular_singles_encounters_prograde(
 
     2, calculate orbital timescales for a_circ1 and a_i and N_orbits/timestep. 
         For example, since
-        :math:`T_orb =2\pi \sqrt(a^3/GM_{smbh})`
+        :math:`T_orb =2\\pi \sqrt(a^3/GM_{smbh})`
         and
         .. math::
         a^3/GM_{smbh} = (10^3r_g)^3/GM_{smbh} = 10^9 (a/10^3r_g)^3 (GM_{smbh}/c^2)^3/GM_{smbh} \\
@@ -74,10 +74,10 @@ def circular_singles_encounters_prograde(
 
         So
         .. math::
-            T_orb   = 2\pi 10^{4.5} (a/10^3r_g)^{3/2} GM_{smbh}/c^3 \\
-                    = 2\pi 10^{4.5} (a/10^3r_g)^{3/2} (6.7e-11*2e38/(3e8)^3) \\
-                    = 2\pi 10^{4.5} (a/10^3r_g)^{3/2} (13.6e27/27e24) \\
-                    = \pi 10^{7.5}  (a/10^3r_g)^{3/2} \\
+            T_orb   = 2\\pi 10^{4.5} (a/10^3r_g)^{3/2} GM_{smbh}/c^3 \\
+                    = 2\\pi 10^{4.5} (a/10^3r_g)^{3/2} (6.7e-11*2e38/(3e8)^3) \\
+                    = 2\\pi 10^{4.5} (a/10^3r_g)^{3/2} (13.6e27/27e24) \\
+                    = \\pi 10^{7.5}  (a/10^3r_g)^{3/2} \\
                     ~ 3yr (a/10^3r_g)^3/2 (M_{smbh}/10^8M_{sun}) \\
         i.e. Orbit~3yr at 10^3r_g around a 10^8M_{sun} SMBH.
         Therefore in a timestep=1.e4yr, a BH at 10^3r_g orbits the SMBH N_orbit/timestep =3,000 times.
