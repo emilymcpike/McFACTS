@@ -158,7 +158,7 @@ def circular_singles_encounters_prograde(
     circ_prograde_population_locations = disk_bh_pro_orbs_a[circ_prograde_population_indices]
 
     # Calculate epsilon --amount to subtract from disk_radius_outer for objects with orb_a > disk_radius_outer
-    epsilon = disk_radius_outer * ((disk_bh_pro_masses / (3 * (disk_bh_pro_masses + smbh_mass)))**(1. / 3.)) * rng.uniform(size=len(disk_bh_pro_masses))
+    #epsilon = disk_radius_outer * ((disk_bh_pro_masses / (3 * (disk_bh_pro_masses + smbh_mass)))**(1. / 3.)) * rng.uniform(size=len(disk_bh_pro_masses))
 
     # T_orb = pi (R/r_g)^1.5 (GM_smbh/c^2) = pi (R/r_g)^1.5 (GM_smbh*2e30/c^2)
     #      = pi (R/r_g)^1.5 (6.7e-11 2e38/27e24)= pi (R/r_g)^1.5 (1.3e11)s =(R/r_g)^1/5 (1.3e4)
@@ -192,12 +192,12 @@ def circular_singles_encounters_prograde(
                             disk_bh_pro_orbs_a[circ_idx] = disk_bh_pro_orbs_a[circ_idx]*(1.0 + delta_energy_strong)
                             # Catch for if orb_a > disk_radius_outer
                             if (disk_bh_pro_orbs_a[circ_idx] > disk_radius_outer):
-                                disk_bh_pro_orbs_a[circ_idx] = disk_radius_outer - epsilon[circ_idx]
+                                disk_bh_pro_orbs_a[circ_idx] = disk_radius_outer #- epsilon[circ_idx]
                             disk_bh_pro_orbs_ecc[ecc_idx] = disk_bh_pro_orbs_ecc[ecc_idx]*(1 - delta_energy_strong)
                             disk_bh_pro_orbs_a[ecc_idx] = disk_bh_pro_orbs_a[ecc_idx]*(1 - delta_energy_strong)
                             # Catch for if orb_a > disk_radius_outer
                             if (disk_bh_pro_orbs_a[ecc_idx] > disk_radius_outer):
-                                disk_bh_pro_orbs_a[ecc_idx] = disk_radius_outer - epsilon[ecc_idx]
+                                disk_bh_pro_orbs_a[ecc_idx] = disk_radius_outer #- epsilon[ecc_idx]
                     num_poss_ints = num_poss_ints + 1
             num_poss_ints = 0
             num_encounters = 0
@@ -370,7 +370,7 @@ def circular_binaries_encounters_ecc_prograde(
     ecc_velocities = scipy.constants.c/np.sqrt(ecc_prograde_population_locations)
 
     # Calculate epsilon --amount to subtract from disk_radius_outer for objects with orb_a > disk_radius_outer
-    epsilon_orb_a = disk_radius_outer * ((ecc_prograde_population_masses / (3 * (ecc_prograde_population_masses + smbh_mass)))**(1. / 3.)) * rng.uniform(size=len(ecc_prograde_population_masses))
+    #epsilon_orb_a = disk_radius_outer * ((ecc_prograde_population_masses / (3 * (ecc_prograde_population_masses + smbh_mass)))**(1. / 3.)) * rng.uniform(size=len(ecc_prograde_population_masses))
 
     if blackholes_binary.num == 0:
         return (blackholes_binary)
@@ -417,7 +417,7 @@ def circular_binaries_encounters_ecc_prograde(
                         ecc_prograde_population_locations[j] = ecc_prograde_population_locations[j] * (1 + delta_energy_strong)
                         # Catch for if location > disk_radius_outer #
                         if (ecc_prograde_population_locations[j] > disk_radius_outer):
-                            ecc_prograde_population_locations[j] = disk_radius_outer - epsilon_orb_a[j]
+                            ecc_prograde_population_locations[j] = disk_radius_outer #- epsilon_orb_a[j]
                         ecc_prograde_population_eccentricities[j] = ecc_prograde_population_eccentricities[j] * (1 + delta_energy_strong)
 
                     if hard < 0:
@@ -430,8 +430,8 @@ def circular_binaries_encounters_ecc_prograde(
                         # Change interloper parameters; decrease a_ecc, decrease e_ecc
                         ecc_prograde_population_locations[j] = ecc_prograde_population_locations[j] * (1 - delta_energy_strong)
                         # Catch for if location > disk_radius_outer
-                        if (ecc_prograde_population_locations[j] > disk_radius_outer): 
-                            ecc_prograde_population_locations[j] = disk_radius_outer - epsilon_orb_a
+                        if (ecc_prograde_population_locations[j] > disk_radius_outer):
+                            ecc_prograde_population_locations[j] = disk_radius_outer #- epsilon_orb_a[j]
                         ecc_prograde_population_eccentricities[j] = ecc_prograde_population_eccentricities[j] * (1 - delta_energy_strong)
 
                     # Catch if bin_ecc or bin_orb_ecc >= 1
@@ -620,7 +620,7 @@ def circular_binaries_encounters_circ_prograde(
     circ_velocities = scipy.constants.c/np.sqrt(circ_prograde_population_locations)
 
     # Calculate epsilon --amount to subtract from disk_radius_outer for objects with orb_a > disk_radius_outer
-    epsilon_orb_a = disk_radius_outer * ((circ_prograde_population_masses / (3 * (circ_prograde_population_masses + smbh_mass)))**(1. / 3.)) * rng.uniform(size=len(circ_prograde_population_masses))
+    #epsilon_orb_a = disk_radius_outer * ((circ_prograde_population_masses / (3 * (circ_prograde_population_masses + smbh_mass)))**(1. / 3.)) * rng.uniform(size=len(circ_prograde_population_masses))
 
     if (blackholes_binary.num == 0):
         return (blackholes_binary)
@@ -664,7 +664,7 @@ def circular_binaries_encounters_circ_prograde(
                         # Change interloper parameters; increase a_ecc, increase e_ecc
                         circ_prograde_population_locations[j] = circ_prograde_population_locations[j] * (1 + delta_energy_strong)
                         if (circ_prograde_population_locations[j] > disk_radius_outer):
-                            circ_prograde_population_locations[j] = disk_radius_outer - epsilon_orb_a[j]
+                            circ_prograde_population_locations[j] = disk_radius_outer #- epsilon_orb_a[j]
                         circ_prograde_population_eccentricities[j] = circ_prograde_population_eccentricities[j] * (1 + delta_energy_strong)
 
                     if hard < 0:
@@ -677,7 +677,7 @@ def circular_binaries_encounters_circ_prograde(
                         # Change interloper parameters; decrease a_ecc, decrease e_ecc
                         circ_prograde_population_locations[j] = circ_prograde_population_locations[j] * (1 - delta_energy_strong)
                         if (circ_prograde_population_locations[j] > disk_radius_outer):
-                            circ_prograde_population_locations[j] = disk_radius_outer - epsilon_orb_a[j]
+                            circ_prograde_population_locations[j] = disk_radius_outer #- epsilon_orb_a[j]
                         circ_prograde_population_eccentricities[j] = circ_prograde_population_eccentricities[j] * (1 - delta_energy_strong)
 
                     # Catch where bin_orb_ecc and bin_ecc >= 1

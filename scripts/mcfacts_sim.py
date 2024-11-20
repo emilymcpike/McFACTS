@@ -928,7 +928,7 @@ def main():
                 if bh_binary_id_num_ionization.size > 0:
                     # Append 2 new BH to arrays of single BH locations, masses, spins, spin angles & gens
                     # For now add 2 new orb ecc term of 0.01. inclination is 0.0 as well. TO DO: calculate v_kick and resulting perturbation to orb ecc.
-                    new_orb_ecc = eccentricity.ionized_orb_ecc(bh_binary_id_num_ionization.size * 2, opts.disk_bh_orb_ecc_max_init)
+                    #new_orb_ecc = eccentricity.ionized_orb_ecc(bh_binary_id_num_ionization.size * 2, opts.disk_bh_orb_ecc_max_init)
                     blackholes_pro.add_blackholes(
                         new_mass=np.concatenate([
                             blackholes_binary.at_id_num(bh_binary_id_num_ionization, "mass_1"),
@@ -1038,9 +1038,9 @@ def main():
 
                         # TODO: calculate v_kick and resulting perturbation to orb ecc. For now set v_kick to 200 km/s
                         v_kick = 200.
-                        bh_orb_ecc_merged = merge.merged_orb_ecc(blackholes_binary.at_id_num(bh_binary_id_num_merger, "bin_orb_a"),
-                                                                 np.full(bh_binary_id_num_merger.size, v_kick),
-                                                                 opts.smbh_mass)
+                        #bh_orb_ecc_merged = merge.merged_orb_ecc(blackholes_binary.at_id_num(bh_binary_id_num_merger, "bin_orb_a"),
+                                                                 #np.full(bh_binary_id_num_merger.size, v_kick),
+                                                                 #opts.smbh_mass)
 
                         # Append new merged BH to arrays of single BH locations, masses, spins, spin angles & gens
                         blackholes_merged.add_blackholes(new_id_num=bh_binary_id_num_merger,
