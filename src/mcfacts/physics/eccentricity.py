@@ -397,6 +397,6 @@ def ionized_orb_ecc(num_bh, orb_ecc_max):
     """
     orb_eccs = rng.uniform(low=0.0, high=orb_ecc_max, size=num_bh)
 
-    #print("orb_eccs",orb_eccs)
+    #print("ionized ecc",orb_eccs)
 
     return (orb_eccs)

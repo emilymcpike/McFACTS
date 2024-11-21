@@ -4,6 +4,7 @@ Module for calculating the final variables of a merging binary.
 import numpy as np
 from astropy import units as u
 from astropy import constants as const
+from mcfacts.mcfacts_random_state import rng
 
 from mcfacts.physics.point_masses import time_of_orbital_shrinkage, si_from_r_g
 
@@ -282,6 +283,8 @@ def merged_orb_ecc(bin_orbs_a, v_kicks, smbh_mass):
     v_kep = ((np.sqrt(const.G * smbh_mass_units / orbs_a_units)).to("km/s")).value
 
     merged_ecc = v_kicks/v_kep
+
+    merged_ecc = rng.uniform(low=0.0, high=v_kicks/v_kep, size=v_kicks.size)
 
     #print("merged_ecc",merged_ecc)
 
