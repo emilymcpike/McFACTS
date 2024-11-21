@@ -152,7 +152,7 @@ def circular_singles_encounters_prograde(
     # Find the e< crit_ecc. population. These are the (circularized) population that can form binaries.
     circ_prograde_population_indices = np.asarray(disk_bh_pro_orbs_ecc <= disk_bh_pro_orb_ecc_crit).nonzero()[0]
     # Find the e> crit_ecc population. These are the interlopers that can perturb the circularized population
-    ecc_prograde_population_indices = np.asarray(disk_bh_pro_orbs_ecc >= disk_bh_pro_orb_ecc_crit).nonzero()[0]
+    ecc_prograde_population_indices = np.asarray(disk_bh_pro_orbs_ecc > disk_bh_pro_orb_ecc_crit).nonzero()[0]
 
     # Get locations for circ population
     circ_prograde_population_locations = disk_bh_pro_orbs_a[circ_prograde_population_indices]

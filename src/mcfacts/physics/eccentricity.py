@@ -395,8 +395,9 @@ def ionized_orb_ecc(num_bh, orb_ecc_max):
     orb_ecc_max : float
         Maximum allowed orb_ecc
     """
-    orb_eccs = rng.uniform(low=0.0, high=orb_ecc_max, size=num_bh)
+    #orb_eccs = rng.uniform(low=0.0, high=orb_ecc_max, size=num_bh)
 
+    orb_eccs = np.full(num_bh, orb_ecc_max)
     #print("ionized ecc",orb_eccs)
 
     return (orb_eccs)
