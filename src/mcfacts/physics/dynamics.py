@@ -9,6 +9,7 @@ import numpy as np
 import scipy
 
 from astropy import units as astropy_units
+from astropy import constants as astropy_const
 
 from mcfacts.mcfacts_random_state import rng
 from mcfacts.physics.point_masses import time_of_orbital_shrinkage
@@ -361,10 +362,10 @@ def circular_binaries_encounters_ecc_prograde(
     ecc_prograde_population_masses = disk_bh_pro_masses[ecc_prograde_population_indices]
     ecc_prograde_population_eccentricities = disk_bh_pro_orbs_ecc[ecc_prograde_population_indices]
     # Find min and max radii around SMBH for eccentric orbiters
-    ecc_orb_min = disk_bh_pro_orbs_a[ecc_prograde_population_indices] * (1.0-disk_bh_pro_orbs_ecc[ecc_prograde_population_indices])
-    ecc_orb_max = disk_bh_pro_orbs_a[ecc_prograde_population_indices] * (1.0+disk_bh_pro_orbs_ecc[ecc_prograde_population_indices])
+    ecc_orb_min = ecc_prograde_population_locations * (1.0-ecc_prograde_population_eccentricities)
+    ecc_orb_max = ecc_prograde_population_locations * (1.0+ecc_prograde_population_eccentricities)
     # Keplerian velocity of ecc prograde orbiter around SMBH (=c/sqrt(a/r_g))
-    ecc_velocities = scipy.constants.c/np.sqrt(ecc_prograde_population_locations)
+    ecc_velocities = scipy.constants.c / np.sqrt(ecc_prograde_population_locations)
 
     # Calculate epsilon --amount to subtract from disk_radius_outer for objects with orb_a > disk_radius_outer
     #epsilon_orb_a = disk_radius_outer * ((ecc_prograde_population_masses / (3 * (ecc_prograde_population_masses + smbh_mass)))**(1. / 3.)) * rng.uniform(size=len(ecc_prograde_population_masses))
@@ -373,12 +374,12 @@ def circular_binaries_encounters_ecc_prograde(
         return (blackholes_binary)
 
     # Create array of random numbers for the chances of encounters
-    chances = rng.uniform(size=(blackholes_binary.num, len(ecc_prograde_population_locations)))
+    chances = rng.uniform(size=(blackholes_binary.num, ecc_prograde_population_indices.size))
 
     # For each binary in blackholes_binary
     for i in range(0, blackholes_binary.num):
         # We compare each single BH to that binary
-        for j in range(0, len(ecc_prograde_population_locations)):
+        for j in range(0, len(ecc_prograde_population_indices)):
             # If binary com orbit lies inside eccentric orbit [min,max] radius
             # i.e. if R_m3_minimum lie inside R_bin_maximum and does R_m3_max lie outside R_bin_minimum
             if (1.0-blackholes_binary.bin_orb_ecc[i]) * blackholes_binary.bin_orb_a[i] < ecc_orb_max[j] and (1.0+blackholes_binary.bin_orb_ecc[i]) * blackholes_binary.bin_orb_a[i] > ecc_orb_min[j]:
@@ -426,9 +427,6 @@ def circular_binaries_encounters_ecc_prograde(
                         blackholes_binary.bin_orb_ecc[i] = blackholes_binary.bin_orb_ecc[i] * (1 + delta_energy_strong)
                         # Change interloper parameters; decrease a_ecc, decrease e_ecc
                         ecc_prograde_population_locations[j] = ecc_prograde_population_locations[j] * (1 - delta_energy_strong)
-                        # Catch for if location > disk_radius_outer
-                        if (ecc_prograde_population_locations[j] > disk_radius_outer):
-                            ecc_prograde_population_locations[j] = disk_radius_outer #- epsilon_orb_a[j]
                         ecc_prograde_population_eccentricities[j] = ecc_prograde_population_eccentricities[j] * (1 - delta_energy_strong)
 
                     # Catch if bin_ecc or bin_orb_ecc >= 1
