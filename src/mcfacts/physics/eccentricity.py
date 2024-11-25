@@ -352,7 +352,7 @@ def bin_ecc_damping(smbh_mass, disk_bh_pro_orbs_a, disk_bh_pro_orbs_masses, disk
     modest_ecc_prograde_indices = np.asarray(prograde_disk_bh_pro_orbs_ecc <= 2.0 * disk_aspect_ratio_func(disk_bh_pro_orbs_a)).nonzero()[0]
 
     # Large orb eccentricities: e > 2h (experience more complicated damping)
-    large_ecc_prograde_indices = np.asarray(prograde_disk_bh_pro_orbs_ecc >= 2.0 * disk_aspect_ratio_func(disk_bh_pro_orbs_a)).nonzero()[0]
+    large_ecc_prograde_indices = np.asarray(prograde_disk_bh_pro_orbs_ecc > 2.0 * disk_aspect_ratio_func(disk_bh_pro_orbs_a)).nonzero()[0]
 
     # print('modest ecc indices', modest_ecc_prograde_indices)
     # print('large ecc indices', large_ecc_prograde_indices)
