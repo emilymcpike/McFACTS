@@ -10,6 +10,8 @@ import pytest
 import scipy
 from astropy import units as u
 
+from mcfacts.inputs.ReadInputs import load_disk_arrays, construct_disk_direct
+
 TEST_SEED = 314159
 
 class InputParameterSet(Enum):
@@ -72,7 +74,7 @@ INPUT_PARAMETERS = {
     },
     "bh_orbital_semi_major_axis_inner": { # 0 - 50 Rg
         InputParameterSet.BASE: [],
-        InputParameterSet.SINGLETON: np.linspace(0, 50, 10),
+        InputParameterSet.SINGLETON: np.linspace(2, 50, 10),
         InputParameterSet.BINARY: [],
         InputParameterSet.DYNAMICS: []
     },
@@ -193,7 +195,7 @@ INPUT_PARAMETER_UNITS = {
     "timestep_duration_yr": u.year
 }
 
-@pytest.fixture
+
 def get_binary_array(parameter_set):
     """Generate test binary array for a given parameter set
 
@@ -206,22 +208,39 @@ def get_binary_array(parameter_set):
 
     return []
 
-@pytest.fixture
-def get_surface_density_func(parameter_set: InputParameterSet):
-    """Generate test surface density function for a given parameter set
+
+def get_surface_density_func(disk_model_name):
+    """Generate test surface density function for a given disk model name
 
         Parameters
         ----------
-        parameter_set : string
-            parameter set name given by `INPUT_PARAMETER_SETS`
+        disk_model_name : string
+            Can be one of the follow options
+            - sirko_goodman: from Sirko & Goodman 2003
+            - thompson_etal: from Thompson, Quataert & Murray 2005
     """
 
-    disk_model_radius_array = INPUT_PARAMETERS["disk_model_radius"][parameter_set]
-    surface_density_array = INPUT_PARAMETERS["disk_surface_density"][parameter_set]
-
-    surf_dens_func_log = scipy.interpolate.UnivariateSpline(disk_model_radius_array, np.log(surface_density_array))
+    disk_model_radii, surface_densities, aspect_ratios, opacities = load_disk_arrays(disk_model_name, 50000)
+    surf_dens_func_log = scipy.interpolate.CubicSpline(np.log(disk_model_radii), np.log(surface_densities))
 
     return lambda x, f=surf_dens_func_log: np.exp(f(x))
+
+
+def get_disk_opacity_func(disk_model_name):
+    """Generate test disk opacity function for a given disk model name
+
+        Parameters
+        ----------
+        disk_model_name : string
+            Can be one of the follow options
+            - sirko_goodman: from Sirko & Goodman 2003
+            - thompson_etal: from Thompson, Quataert & Murray 2005
+    """
+
+    disk_model_radii, surface_densities, aspect_ratios, opacities = load_disk_arrays(disk_model_name, 50000)
+    disk_opacity_func_log = scipy.interpolate.CubicSpline(np.log(disk_model_radii), np.log(opacities))
+
+    return lambda x, f=disk_opacity_func_log: np.exp(f(np.log(x)))
 
 
 # if __name__ == "__main__":
