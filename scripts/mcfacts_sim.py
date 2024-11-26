@@ -528,7 +528,6 @@ def main():
                 blackholes_pro.remove_id_num(bh_pro_id_num_unphysical_a)
                 filing_cabinet.remove_id_num(bh_pro_id_num_unphysical_a)
 
-
             # Accrete
             blackholes_pro.mass = accretion.change_bh_mass(
                 blackholes_pro.mass,
